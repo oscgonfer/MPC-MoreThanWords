@@ -1,0 +1,17 @@
+# MAC stuff
+*/.DS_Store
+.DS_Store
+
+.pioenvs
+.pioenvs\
+.piolibdeps
+platformio.ini
+*.travis.yml
+.travis.yml
+*.yml
+*.ini
+*.orig
+*/bin
+*.app
+
+*/obj
