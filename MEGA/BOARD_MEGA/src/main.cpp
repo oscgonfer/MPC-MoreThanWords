@@ -6,7 +6,7 @@
 #define LED LED_BUILTIN
 
 int pin_check;
-int bit;
+int message;
 
 void setup() {
 	Serial.begin(9600);
@@ -28,15 +28,18 @@ void loop() {
 
 	uint16_t pin_status = PINK << 8;
 	pin_status += PINF;
+	message = 0;
 
 	// CHECK PIN STATUS
 	for (int i= 0; i <16; i++){
 		pin_check = 1<<i;
-		bit = bit_is_false(pin_status,pin_check);
-		Serial.print(bit);
+		int bit = bit_is_false(pin_status,pin_check);
+		// message += bit << i;
+		Serial.print(bit, BIN);
 	}
 
-	Serial.println();
+	Serial.print('\n');
+	// Serial.println(message, BIN);
 
 	delay(100);
 

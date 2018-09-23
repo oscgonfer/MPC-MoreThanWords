@@ -1,6 +1,9 @@
 #include "ofApp.h"
 #include "lists.h"
 
+#include <sstream>
+#include <string>
+
 //--------------------------------------------------------------
 
 void ofApp::setup(){
@@ -14,24 +17,82 @@ void ofApp::setup(){
     cout <<"Device list size "<< ofToString(deviceList.size())<< endl;
     
     //FIND ARDUINO'S INDEX HERE
-    Serial.setup(0, 9600); //FIX IF THIS
-    Serial.startContinuousRead();
-    ofAddListener(Serial.NEW_MESSAGE, this, &ofApp::onNewMessage);
-
-    messageSerial = "";
+    Serial.setup(0, 9600);
+    
+    // Serial.startContinuousRead();
+    // ofAddListener(Serial.NEW_MESSAGE, this, &ofApp::onNewMessage);
 
     // Some viz stuff
     ofBackground(40,41,35);
+
+    for (int i = 0; i< totRows; i ++) {
+    	for (int j = 0; j <totColumns; j ++ ){
+    		arrayButton[i][j] = false;
+    	}
+    }
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
+
 	bool pressed;
 	bool isplaying;
 	bool istitleplaying;
 	bool isambientplaying;
 	int indexList;
 	float speedAmbient;
+
+	int bytesRequired = 38;
+	unsigned char bytes[bytesRequired];
+	int bytesRemaining = bytesRequired;
+	// loop until we've read everything
+	while (bytesRemaining > 0)
+	{
+		// check for data
+	  	if ( Serial.available() > 8 ) {
+	    // try to read - note offset into the bytes[] array, this is so
+	    // that we don't overwrite the bytes we already have
+	    int bytesArrayOffset = bytesRequired - bytesRemaining;
+	    int result = Serial.readBytes( &bytes[bytesArrayOffset],
+	      bytesRemaining );
+
+	    // check for error code
+	    if ( result == OF_SERIAL_ERROR ) {
+	    	// something bad happened
+	    	ofLog( OF_LOG_ERROR, "unrecoverable error reading from serial" );
+	      	// bail out
+	    	break;
+	    } else if ( result == OF_SERIAL_NO_DATA ) {
+	    	// nothing was read, try again
+	    } else {
+	    	// we read some data!
+	    	bytesRemaining -= result;
+	    }
+	  }
+	}
+
+	int pos1 = 0;
+	for (int i = 0; i < bytesRequired; i++) {
+        if ((bytes[i]== '\n') && pos1 == 0) {
+            pos1 = i;
+        }
+    }
+
+    for (int i = 0; i < 16; i++) {
+
+		int row = floor(i/totRows);
+		int column = i-row*totRows;
+
+		pressed = arrayButton[row][column];
+		if (bytes[pos1 + i + 1] == '1') {
+    		arrayButton[row][column] = true;
+    	} else {
+    		arrayButton[row][column] = false;
+     		if (pressed) {
+				timeLastReleased[row][column] = ofGetElapsedTimef();
+			}
+    	}
+    }
 
 	switch (status) {
 		
@@ -375,6 +436,7 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
 
+
 	if (viewGraph) {
 		for (int i = 0; i<totRows; i++){
 			for (int j = 0; j<totColumns; j++) {
@@ -382,6 +444,7 @@ void ofApp::draw(){
 				bool pressed = arrayButton[i][j];
 
 				if (pressed) {
+					cout << i << " - " << j << " - " << pressed;
 					ofSetColor(248,35,114);
 				} else {
 					ofSetColor(235,237,239);
@@ -397,23 +460,21 @@ void ofApp::draw(){
 
 	    		ofDrawRectangle(rect);
 
-	    		// Text in center if is playing
-	    		int textOnX = rect.x + rectSide/2;
-	    		int textOnY = rect.y + rectSide/2;
+	   //  		// Text in center if is playing
+	   //  		int textOnX = rect.x + rectSide/2;
+	   //  		int textOnY = rect.y + rectSide/2;
 
-	    		bool playing;
-	    		playing = soundList[i][j].isPlaying();
+	   //  		bool playing;
+	   //  		playing = soundList[i][j].isPlaying();
 				ofSetColor(40,41,35);
-	    		stringstream text;
-	    		if (playing) {
-	    			text << "ON" << endl;
-	    		} else {
-	    			text << "OFF" << endl;
-	    		}
+	   //  		stringstream text;
+	   //  		if (playing) {
+	   //  			text << "ON" << endl;
+	   //  		} else {
+	   //  			text << "OFF" << endl;
+	   //  		}
 
-	            // reportStream2 << "P position" <<p.x<<" - "<<p.y<< endl;
-	            
-	            ofDrawBitmapString(text.str(), textOnX, textOnY);
+	   //          ofDrawBitmapString(text.str(), textOnX, textOnY);
 
 	            // Text below for time last released
 	            int textReleasedX = rect.x + rectSide/10;
@@ -425,22 +486,21 @@ void ofApp::draw(){
 
 				ofDrawBitmapString(textTime.str(), textReleasedX, textReleasedY);
 
-				// Text below for time last released
-	            int textSpeedX = rect.x + rectSide/10;
-	    		int textSpeedY = rect.y + 8*rectSide/10; 
+				// // Text below for time last released
+	   //          int textSpeedX = rect.x + rectSide/10;
+	   //  		int textSpeedY = rect.y + 8*rectSide/10; 
 
 
-				float speed = 0;
-	    		speed = soundList[i][j].getSpeed();
-	    		stringstream textSpeed;
-	    		textSpeed << "Speed: " << speed << endl;
+				// float speed = 0;
+	   //  		speed = soundList[i][j].getSpeed();
+	   //  		stringstream textSpeed;
+	   //  		textSpeed << "Speed: " << speed << endl;
 
-				ofDrawBitmapString(textSpeed.str(), textSpeedX, textSpeedY);
+				// ofDrawBitmapString(textSpeed.str(), textSpeedX, textSpeedY);
 			}
 		}
 	}
-	
-	
+
 }
 
 //--------------------------------------------------------------
@@ -456,38 +516,3 @@ void ofApp::keyPressed(int key){
             break;
     }
 }
-
-//--------------------------------------------------------------
-void ofApp::keyReleased(int key){
-
-}
-
-
-void ofApp::onNewMessage(string & message)
-{
-	bool pressed;
-	cout << "onNewMessage, message: " << message << "\n";
-
-	if (message == "RESET") {
-		status = FADE_OUT_AND_STOP;
-	}
-	
-	for (int row=0; row<totRows; row++){
-		for (int column=0; column<totColumns; column++){
-
-			int indexList = row * totRows + column;
-			pressed = arrayButton[row][column];
-
-			if (int(message[indexList]) == 1){
-				arrayButton[row][column] = true;
-			} else {
-				arrayButton[row][column] = false;
-				// if the previous state was on, then set release time
-				if (pressed) {
-					timeLastReleased[row][column] = ofGetElapsedTimef();
-				}
-			}
-		}
-	}
-}
-

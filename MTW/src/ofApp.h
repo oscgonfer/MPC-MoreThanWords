@@ -8,7 +8,6 @@
 
 #include <math.h> //floor
 #include <list> //list
-// #include <algorithm>    // std::max
 
 using namespace std;
 
@@ -20,7 +19,6 @@ class ofApp : public ofBaseApp{
 		void draw();
 
 		void keyPressed(int key);
-		void keyReleased(int key);
 		void onNewMessage(string & message);
 
 		enum GLOBAL_STATUS
@@ -74,8 +72,7 @@ class ofApp : public ofBaseApp{
 		bool viewGraph = false;
 
 		//SERIAL
-    	ofxSimpleSerial    Serial;
+    	ofSerial Serial;
     	ofSerialDeviceInfo SerialInfo;
     
-    	string        messageSerial;
 };
