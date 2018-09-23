@@ -6,6 +6,12 @@
 #include <sstream>
 #include <string>
 
+#include <math.h> //floor
+#include <list> //list
+// #include <algorithm>    // std::max
+
+using namespace std;
+
 class ofApp : public ofBaseApp{
 
 	public:
@@ -52,7 +58,14 @@ class ofApp : public ofBaseApp{
 		float timeLastReleased[totRows][totColumns]; // time since it has been off
 
 		float timeOffMin = 1; // Minimum time off for replay
-
+		int timeFadeOut = 2; // Time in seconds to fade out
+		float speedAmbient = 1;
+		bool ambientHasBeenReleased = false;
+		bool ambientHasBeenPressed = false;
+		float targetSpeedAmbient = 2;
+		float timeTransientSpeedAmbient = 1;
+		float ambientReleaseTime = 0;
+		float ambientPressTime = 0;
 		// Draw
 
 		int minRectPos = 40;

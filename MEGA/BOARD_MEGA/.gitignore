@@ -1,0 +1,7 @@
+.pioenvs
+.pioenvs\
+.piolibdeps
+
+# MAC stuff
+*/.DS_Store
+.DS_Store

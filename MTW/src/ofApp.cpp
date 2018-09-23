@@ -1,7 +1,5 @@
 #include "ofApp.h"
 #include "lists.h"
-#include <math.h> //floor
-#include <list> //list
 
 //--------------------------------------------------------------
 
@@ -33,6 +31,7 @@ void ofApp::update(){
 	bool istitleplaying;
 	bool isambientplaying;
 	int indexList;
+	float speedAmbient;
 
 	switch (status) {
 		
@@ -143,6 +142,7 @@ void ofApp::update(){
 						soundList[row][column].stop();
 						soundList[row][column].play();
 						soundList[row][column].setMultiPlay(false);
+
 					}
 
 					// Play ambient
@@ -150,7 +150,8 @@ void ofApp::update(){
 						soundList[row][column].play();
 
 						indexAmbient = indexList;
-
+						ambientHasBeenPressed = true;
+						ambientHasBeenReleased = false;
 						status = STORY_PRELOAD;
 
 						break;
@@ -221,6 +222,7 @@ void ofApp::update(){
 			colAmbient = indexAmbient-rowAmbient*totRows;
 
 			isambientplaying = soundList[rowAmbient][colAmbient].isPlaying();
+			speedAmbient = soundList[rowAmbient][colAmbient].getSpeed();
 
 			for (int row = 0; row < totRows; row++){
 				for (int column = 0; column < totColumns; column++){
@@ -239,14 +241,42 @@ void ofApp::update(){
 						soundList[row][column].setMultiPlay(false);
 					}
 
-					// TO CHECK WITH REBECCA: IF WE HIT THE SAME AMBIENT IS PLAYING DOES IT START OVER?
+					// Case when ambient is done on it's own
 					if (pressed && indexList==indexAmbient && !isambientplaying) {
 						soundList[row][column].play();
 						soundList[row][column].setMultiPlay(false);
+						soundList[row][column].setSpeed(1.0f);
+						ambientHasBeenReleased = false;
+						ambientHasBeenPressed = true;
 					}
 
-					if (pressed && indexList==indexAmbient && isambientplaying) {
-						// Do something to accelerate the ambient (modify it)
+					// Check when ambient has been released after pressed
+					if (!pressed && indexList == indexAmbient && ambientHasBeenPressed){
+						// Ambient has been released
+						ambientHasBeenReleased = true;
+						ambientHasBeenPressed = false;
+						ambientReleaseTime = ofGetElapsedTimef();
+					}
+
+					// Check when ambient has been pressed after released
+					if (pressed && indexList == indexAmbient && ambientHasBeenReleased) {
+						ambientHasBeenPressed = true;
+						ambientHasBeenReleased = false;
+						ambientPressTime = ofGetElapsedTimef();
+					}
+
+					// Change speed of ambient in case of release
+					if (!pressed && ambientHasBeenReleased && speedAmbient > 1 && indexList == indexAmbient && isambientplaying) {
+						float newSpeedAmbient = fmax(1, targetSpeedAmbient - (ofGetElapsedTimef() - ambientReleaseTime)/timeTransientSpeedAmbient);
+						// Put speed back to normal
+						soundList[row][column].setSpeed(newSpeedAmbient);
+					}
+
+					// Change speed of ambient in case of re-press
+					if (pressed && ambientHasBeenPressed && indexList==indexAmbient && isambientplaying) {
+						float newSpeedAmbient = fmax(targetSpeedAmbient, (ofGetElapsedTimef()-ambientPressTime)/timeTransientSpeedAmbient + 1);
+						// Set the desired speed
+						soundList[row][column].setSpeed(newSpeedAmbient);
 					}
 
 					// TO CHECK WITH REBECCA: IF WE HIT ANOTHER AMBIENT DOES IT STOP THE OTHER AND START THE NEW ONE?
@@ -281,7 +311,7 @@ void ofApp::update(){
 							if (typeList[row][column]==1) {
 								soundList[row][column].stop(); // be careful with this
 								soundList[row][column].play();
-							} else if (typeList[row][column] ==2) {
+							} else if (typeList[row][column] == 2) {
 								// If we press one that is in loop, but it is still playing
 								soundList[row][column].setLoop(true);
 							}
@@ -304,15 +334,36 @@ void ofApp::update(){
 
 			break;
 		}
+
 		case FADE_OUT_AND_STOP:
 		{
-			for (int row = 0; row < totRows; row++){
-				for (int column = 0; column < totColumns; column++){
-					// Implement something for fade out and stop
-					soundList[row][column].stop();
+			float timeLeftFadeOut = 0;
+			float timeStartFadeOut = 0;
+			float targetVolume = 1;
+			
+			// Set time left for fade out as max time for fade out
+			timeLeftFadeOut = timeFadeOut;
+			// Get time at which we will start fading out
+			timeStartFadeOut = ofGetElapsedTimef(); 
+
+			while (timeLeftFadeOut>0) {
+				// Re calculate time left
+				timeLeftFadeOut = timeFadeOut - (ofGetElapsedTimef() - timeStartFadeOut);
+				// Calculate the target volume
+				targetVolume = timeLeftFadeOut/timeFadeOut;
+
+				for (int row = 0; row < totRows; row++){
+					for (int column = 0; column < totColumns; column++){
+
+						if (targetVolume == 0) {
+							soundList[row][column].stop();
+						} else {
+							soundList[row][column].setVolume(targetVolume);
+						}
+					}
 				}
 			}
-
+		
 			status = TITLE_PRELOAD;
 
 			break;
@@ -368,7 +419,7 @@ void ofApp::draw(){
 	            int textReleasedX = rect.x + rectSide/10;
 	    		int textReleasedY = rect.y + rectSide/10; 
 
-	    		float time = 0;
+	    		float time = timeLastReleased[i][j];
 	    		stringstream textTime;
 	    		textTime << "Time Rel: " << time << endl;
 
@@ -385,8 +436,6 @@ void ofApp::draw(){
 	    		textSpeed << "Speed: " << speed << endl;
 
 				ofDrawBitmapString(textSpeed.str(), textSpeedX, textSpeedY);
-
-
 			}
 		}
 	}
