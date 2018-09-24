@@ -18,6 +18,7 @@ void ofApp::setup(){
     
     //FIND ARDUINO'S INDEX HERE
     Serial.setup(0, 9600);
+    Serial.flush();
     
     // Serial.startContinuousRead();
     // ofAddListener(Serial.NEW_MESSAGE, this, &ofApp::onNewMessage);
@@ -42,14 +43,16 @@ void ofApp::update(){
 	int indexList;
 	float speedAmbient;
 
-	int bytesRequired = 38;
+
+	// Read Serial
+	int bytesRequired = 33;
 	unsigned char bytes[bytesRequired];
 	int bytesRemaining = bytesRequired;
 	// loop until we've read everything
 	while (bytesRemaining > 0)
 	{
-		// check for data
-	  	if ( Serial.available() > 8 ) {
+		// check for OF_SERIAL_NO_DATA
+	  	if ( Serial.available() > 0 ) {
 	    // try to read - note offset into the bytes[] array, this is so
 	    // that we don't overwrite the bytes we already have
 	    int bytesArrayOffset = bytesRequired - bytesRemaining;
@@ -71,14 +74,17 @@ void ofApp::update(){
 	  }
 	}
 
+	// look for the '\n' character
 	int pos1 = 0;
+	bool reset = true;
 	for (int i = 0; i < bytesRequired; i++) {
         if ((bytes[i]== '\n') && pos1 == 0) {
             pos1 = i;
         }
     }
 
-    for (int i = 0; i < 16; i++) {
+    // Check who has been pressed
+	for (int i = 0; i < 16; i++) {
 
 		int row = floor(i/totRows);
 		int column = i-row*totRows;
@@ -87,13 +93,22 @@ void ofApp::update(){
 		if (bytes[pos1 + i + 1] == '1') {
     		arrayButton[row][column] = true;
     	} else {
+    		reset = false;
     		arrayButton[row][column] = false;
      		if (pressed) {
 				timeLastReleased[row][column] = ofGetElapsedTimef();
 			}
     	}
+	}
+
+	// Define reset status
+    if (reset) {
+    	cout << "RESET" << endl;
+    	status = FADE_OUT_AND_STOP; 
+    	reset = false;
     }
 
+    // 'State machine'
 	switch (status) {
 		
 		case TITLE_PRELOAD:
@@ -444,7 +459,7 @@ void ofApp::draw(){
 				bool pressed = arrayButton[i][j];
 
 				if (pressed) {
-					cout << i << " - " << j << " - " << pressed;
+					// cout << i << " - " << j << " - " << pressed;
 					ofSetColor(248,35,114);
 				} else {
 					ofSetColor(235,237,239);
