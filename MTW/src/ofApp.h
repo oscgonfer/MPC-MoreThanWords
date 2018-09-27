@@ -53,6 +53,7 @@ class ofApp : public ofBaseApp{
 
 		ofSoundPlayer soundList[totRows][totColumns];
 		int typeList[totRows][totColumns]; // 1: single / 2: loop / 3: ambient relocated
+		float volumeList[totRows][totColumns];
 		float timeLastReleased[totRows][totColumns]; // time since it has been off
 
 		float timeOffMin = 1; // Minimum time off for replay

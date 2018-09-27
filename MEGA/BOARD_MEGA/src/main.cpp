@@ -7,7 +7,7 @@
 
 // RESET BUTTONS
 #define RESET_BUTTON_PIN	2
-#define RESET_BUTTON_LED_PIN  9
+#define RESET_BUTTON_LED_PIN  3
 
 float buttonPow = 0;
 

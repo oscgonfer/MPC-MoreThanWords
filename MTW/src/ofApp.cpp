@@ -19,16 +19,14 @@ void ofApp::setup(){
     //FIND ARDUINO'S INDEX HERE
     Serial.setup(0, 9600);
     Serial.flush();
-    
-    // Serial.startContinuousRead();
-    // ofAddListener(Serial.NEW_MESSAGE, this, &ofApp::onNewMessage);
 
     // Some viz stuff
     ofBackground(40,41,35);
 
-    for (int i = 0; i< totRows; i ++) {
-    	for (int j = 0; j <totColumns; j ++ ){
-    		arrayButton[i][j] = false;
+    // Init everything to not pressed
+    for (int row = 0; row< totRows; row ++) {
+    	for (int column = 0; column<totColumns; column++ ){
+    		arrayButton[row][column] = false;
     	}
     }
 }
@@ -42,7 +40,6 @@ void ofApp::update(){
 	bool isambientplaying;
 	int indexList;
 	float speedAmbient;
-
 
 	// Read Serial
 	int bytesRequired = 33;
@@ -119,6 +116,7 @@ void ofApp::update(){
 					indexList = row * totRows + column;
 					arrayButton[row][column] = false;
 					soundList[row][column].load(pathtoSound + soundListTitle[indexList]);
+					volumeList[row][column] = soundListTitleVol[indexList];
 					// No time constraint
 					timeLastReleased[row][column] = 0;
 				}
@@ -142,6 +140,7 @@ void ofApp::update(){
 					if (pressed && lapseOff > timeOffMin) {
 						soundList[row][column].stop();
 						soundList[row][column].play();
+						soundList[row][column].setVolume(volumeList[row][column]);
 						soundList[row][column].setMultiPlay(false);
 
 						indexTitle = row * totRows + column;
@@ -161,18 +160,24 @@ void ofApp::update(){
 		{
 			// Define list Ambient from title selected
 			std::vector<string> listAmbient;
+			std::vector<float> listAmbientVol;
+
 			switch (storyNumber){
 				case 1:
 					listAmbient = listAmbient_T1;
+					listAmbientVol = listAmbient_T1Vol;
 					break;
 				case 2:
 					listAmbient = listAmbient_T2;
+					listAmbientVol = listAmbient_T2Vol;
 					break;
 				case 3: 
 					listAmbient = listAmbient_T3;
+					listAmbientVol = listAmbient_T3Vol;
 					break;
 				case 4: 
 					listAmbient = listAmbient_T4;
+					listAmbientVol = listAmbient_T4Vol;
 					break;
 			}
 
@@ -185,7 +190,8 @@ void ofApp::update(){
 					if (indexList!=indexTitle) {
 						soundList[row][column].unload();
 						// Load ambients
-						soundList[row][column].load(pathtoSound + listAmbient[indexList]);						
+						soundList[row][column].load(pathtoSound + listAmbient[indexList]);	
+						volumeList[row][column] = listAmbientVol[indexList];				
 					}
 				}
 			} 
@@ -217,6 +223,7 @@ void ofApp::update(){
 					if (pressed && indexList==indexTitle && lapseOff>timeOffMin) {
 						soundList[row][column].stop();
 						soundList[row][column].play();
+						soundList[row][column].setVolume(volumeList[row][column]);
 						soundList[row][column].setMultiPlay(false);
 
 					}
@@ -224,6 +231,7 @@ void ofApp::update(){
 					// Play ambient
 					if (pressed && indexList!=indexTitle) {
 						soundList[row][column].play();
+						soundList[row][column].setVolume(volumeList[row][column]);
 
 						indexAmbient = indexList;
 						ambientHasBeenPressed = true;
@@ -241,26 +249,31 @@ void ofApp::update(){
 			// Define list sounds
 			std::vector<string> listSounds;
 			std::vector<int> listType;
+			std::vector<float> listSoundVol;
 
 			switch (storyNumber){
 				case 1:
 					listSounds = listSounds_T1;
 					listType = listSoundsTypes_T1;
+					listSoundVol = listSounds_T1Vol;
 
 					break;
 				case 2:
 					listSounds = listSounds_T2;
 					listType = listSoundsTypes_T2;
+					listSoundVol = listSounds_T2Vol;
 
 					break;
 				case 3: 
 					listSounds = listSounds_T3;
 					listType = listSoundsTypes_T3;
+					listSoundVol = listSounds_T3Vol;
 
 					break;
 				case 4: 
 					listSounds = listSounds_T4;
 					listType = listSoundsTypes_T4;
+					listSoundVol = listSounds_T4Vol;
 
 					break;
 			}
@@ -276,6 +289,7 @@ void ofApp::update(){
 						// Load stories
 						soundList[row][column].load(pathtoSound + listSounds[indexList]);	
 						typeList[row][column] = listType[indexList];
+						volumeList[row][column] = listSoundVol[indexList];
 						// TO CHECK WHERE TO PUT THE OTHER AMBIENTS					
 					}
 				}
@@ -314,12 +328,14 @@ void ofApp::update(){
 					if (pressed && indexList==indexTitle && lapseOff>timeOffMin) {
 						soundList[row][column].stop();
 						soundList[row][column].play();
+						soundList[row][column].setVolume(volumeList[row][column]);
 						soundList[row][column].setMultiPlay(false);
 					}
 
 					// Case when ambient is done on it's own
 					if (pressed && indexList==indexAmbient && !isambientplaying) {
 						soundList[row][column].play();
+						soundList[row][column].setVolume(volumeList[row][column]);
 						soundList[row][column].setMultiPlay(false);
 						soundList[row][column].setSpeed(1.0f);
 						ambientHasBeenReleased = false;
@@ -369,7 +385,8 @@ void ofApp::update(){
 						if (!soundList[row][column].isPlaying()) {
 
 							soundList[row][column].play();
-							
+							soundList[row][column].setVolume(volumeList[row][column]);
+
 							if (typeList[row][column]==2){
 								// The sound type is loop
 								soundList[row][column].setLoop(true);
@@ -387,6 +404,8 @@ void ofApp::update(){
 							if (typeList[row][column]==1) {
 								soundList[row][column].stop(); // be careful with this
 								soundList[row][column].play();
+								soundList[row][column].setVolume(volumeList[row][column]);
+
 							} else if (typeList[row][column] == 2) {
 								// If we press one that is in loop, but it is still playing
 								soundList[row][column].setLoop(true);
