@@ -27,6 +27,8 @@ void ofApp::setup(){
     for (int row = 0; row< totRows; row ++) {
     	for (int column = 0; column<totColumns; column++ ){
     		arrayButton[row][column] = false;
+    		soundHasBeenPressed[row][column] = false;
+    		soundHasBeenReleased[row][column] = true;
     	}
     }
 }
@@ -94,7 +96,9 @@ void ofApp::update(){
     		arrayButton[row][column] = false;
      		if (pressed) {
 				timeLastReleased[row][column] = ofGetElapsedTimef();
-			}
+				timeLastPressed[row][column] = ofGetElapsedTimef();
+				soundHasBeenPressed[row][column] = true;
+			} 
     	}
 	}
 
@@ -115,7 +119,7 @@ void ofApp::update(){
 
 					indexList = row * totRows + column;
 					arrayButton[row][column] = false;
-					soundList[row][column].load(pathtoSound + soundListTitle[indexList]);
+					soundList[row][column].load(pathtoSound + soundListTitle[indexList], true);
 					volumeList[row][column] = soundListTitleVol[indexList];
 					// No time constraint
 					timeLastReleased[row][column] = 0;
@@ -137,9 +141,11 @@ void ofApp::update(){
 					// Time Pressed check
 					float lapseOff = ofGetElapsedTimef() - timeLastReleased[row][column];
 
-					if (pressed && lapseOff > timeOffMin) {
+					if (pressed && !isplaying) {
 						soundList[row][column].stop();
 						soundList[row][column].play();
+						timeLastReleased[row][column] = ofGetElapsedTimef();
+
 						soundList[row][column].setVolume(volumeList[row][column]);
 						soundList[row][column].setMultiPlay(false);
 
@@ -190,7 +196,7 @@ void ofApp::update(){
 					if (indexList!=indexTitle) {
 						soundList[row][column].unload();
 						// Load ambients
-						soundList[row][column].load(pathtoSound + listAmbient[indexList]);	
+						soundList[row][column].load(pathtoSound + listAmbient[indexList], true);	
 						volumeList[row][column] = listAmbientVol[indexList];				
 					}
 				}
@@ -218,20 +224,39 @@ void ofApp::update(){
 
 					// Time Pressed check
 					float lapseOff = ofGetElapsedTimef() - timeLastReleased[row][column];
+					float lapseOn = ofGetElapsedTimef() - timeLastPressed[row][column];
+					
+					if (!pressed && indexList==indexTitle && lapseOff >timeOffMin && soundHasBeenPressed[row][column]) {
+						soundHasBeenPressed[row][column] = false;
+						soundHasBeenReleased[row][column] = true;
+						timeLastReleased[row][column]=ofGetElapsedTimef();
+					}
 
-					// If title pressed and it has been released
-					if (pressed && indexList==indexTitle && lapseOff>timeOffMin) {
+					if (pressed && indexList==indexTitle && lapseOn > timeOnMin && soundHasBeenReleased[row][column]) {
 						soundList[row][column].stop();
 						soundList[row][column].play();
+						timeLastReleased[row][column] = ofGetElapsedTimef();
+
 						soundList[row][column].setVolume(volumeList[row][column]);
 						soundList[row][column].setMultiPlay(false);
 
+						indexTitle = row * totRows + column;
+						storyNumber = listTitleNumber[indexTitle];
+						
+						status = AMBIENT_PRELOAD;
+
+						timeLastPressed[row][column]=ofGetElapsedTimef();
+						soundHasBeenPressed[row][column]=true;
+						soundHasBeenReleased[row][column]=false;
+
+						break;
 					}
 
 					// Play ambient
 					if (pressed && indexList!=indexTitle) {
 						soundList[row][column].play();
 						soundList[row][column].setVolume(volumeList[row][column]);
+						soundList[row][column].setLoop(true);
 
 						indexAmbient = indexList;
 						ambientHasBeenPressed = true;
@@ -286,8 +311,22 @@ void ofApp::update(){
 					// Unload everything except the title and ambient
 					if (indexList!=indexTitle && indexList!=indexAmbient) {
 						soundList[row][column].unload();
+						cout << "ALL UNLOAD" << endl;
+					}
+				}
+			}
+
+
+			for (int row = 0; row < totRows; row++){
+				for (int column = 0; column < totColumns; column++){	
+					indexList = row * totRows + column;
+
+					// Unload everything except the title and ambient
+					if (indexList!=indexTitle && indexList!=indexAmbient) {
 						// Load stories
-						soundList[row][column].load(pathtoSound + listSounds[indexList]);	
+						soundList[row][column].load(pathtoSound + listSounds[indexList], true);	
+
+						cout << "problem" <<endl;
 						typeList[row][column] = listType[indexList];
 						volumeList[row][column] = listSoundVol[indexList];
 						// TO CHECK WHERE TO PUT THE OTHER AMBIENTS					
@@ -301,6 +340,7 @@ void ofApp::update(){
 		}
 		case STORY_LOADED:
 		{
+
 			// Check if title is playing
 			rowTitle = floor(indexTitle/totRows);
 			colTitle = indexTitle-rowTitle*totRows;
@@ -320,16 +360,30 @@ void ofApp::update(){
 					indexList = row * totRows + column;
 
 					pressed = arrayButton[row][column];
-
-					// Time Pressed check
 					float lapseOff = ofGetElapsedTimef() - timeLastReleased[row][column];
 					
-					// Title case
-					if (pressed && indexList==indexTitle && lapseOff>timeOffMin) {
+					if (!pressed && typeList[row][column] != 2 && lapseOff >timeOffMin && soundHasBeenPressed[row][column]){
+						soundHasBeenReleased[row][column] = true;
+						soundHasBeenPressed[row][column] = false;
+						timeLastReleased[row][column] = ofGetElapsedTimef();
+					}
+
+					// Time Pressed check
+					
+					float lapseOn = ofGetElapsedTimef() - timeLastPressed[row][column];
+
+					// Titles case
+					if (pressed && typeList[row][column] == 3 && lapseOn>timeOnMin && soundHasBeenReleased[row][column]) {
+						cout << "HI" << endl;
 						soundList[row][column].stop();
 						soundList[row][column].play();
 						soundList[row][column].setVolume(volumeList[row][column]);
 						soundList[row][column].setMultiPlay(false);
+
+						soundHasBeenPressed[row][column]=true;
+						soundHasBeenReleased[row][column]=false;
+						timeLastPressed[row][column] = ofGetElapsedTimef();
+
 					}
 
 					// Case when ambient is done on it's own
@@ -379,12 +433,14 @@ void ofApp::update(){
 					// }
 
 					// Normal pressed 
-					if (pressed && indexList!=indexTitle && indexList!=indexAmbient) {
+					if (pressed && typeList[row][column] != 3 && indexList!=indexAmbient) {
 						
 						// If it's not already playing, start it
 						if (!soundList[row][column].isPlaying()) {
 
 							soundList[row][column].play();
+							timeLastReleased[row][column] = ofGetElapsedTimef();
+
 							soundList[row][column].setVolume(volumeList[row][column]);
 
 							if (typeList[row][column]==2){
@@ -395,6 +451,8 @@ void ofApp::update(){
 							} else if (typeList[row][column]==1) {
 								// The sound type is single
 								soundList[row][column].setLoop(false);
+								soundList[row][column].setMultiPlay(false);
+
 								// soundList[row][column].setMultiPlay(true); // be careful with this
 
 							}
@@ -402,7 +460,7 @@ void ofApp::update(){
 						} else if (soundList[row][column].isPlaying() && lapseOff > timeOffMin){
 							// If we press-release-press one that is in multiplay, single, stop and play again
 							if (typeList[row][column]==1) {
-								soundList[row][column].stop(); // be careful with this
+								// soundList[row][column].stop(); // be careful with this
 								soundList[row][column].play();
 								soundList[row][column].setVolume(volumeList[row][column]);
 
@@ -434,7 +492,7 @@ void ofApp::update(){
 		{
 			float timeLeftFadeOut = 0;
 			float timeStartFadeOut = 0;
-			float targetVolume = 1;
+			float targetFactor = 1;
 			
 			// Set time left for fade out as max time for fade out
 			timeLeftFadeOut = timeFadeOut;
@@ -445,15 +503,16 @@ void ofApp::update(){
 				// Re calculate time left
 				timeLeftFadeOut = timeFadeOut - (ofGetElapsedTimef() - timeStartFadeOut);
 				// Calculate the target volume
-				targetVolume = timeLeftFadeOut/timeFadeOut;
+				targetFactor = timeLeftFadeOut/timeFadeOut;
 
 				for (int row = 0; row < totRows; row++){
 					for (int column = 0; column < totColumns; column++){
 
-						if (targetVolume == 0) {
+						if (targetFactor == 0) {
 							soundList[row][column].stop();
 						} else {
-							soundList[row][column].setVolume(targetVolume);
+
+							soundList[row][column].setVolume(targetFactor*volumeList[row][column]);
 						}
 					}
 				}

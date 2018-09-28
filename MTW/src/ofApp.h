@@ -55,14 +55,22 @@ class ofApp : public ofBaseApp{
 		int typeList[totRows][totColumns]; // 1: single / 2: loop / 3: ambient relocated
 		float volumeList[totRows][totColumns];
 		float timeLastReleased[totRows][totColumns]; // time since it has been off
+		float timeLastPressed[totRows][totColumns]; // time since it has been off
 
-		float timeOffMin = 1; // Minimum time off for replay
-		int timeFadeOut = 2; // Time in seconds to fade out
+
+		float timeOffMin = 0.1; // Minimum time off for replay
+		float timeOnMin = 0.2; // Minimum time off for replay
+
+		int timeFadeOut = 5; // Time in seconds to fade out
 		float speedAmbient = 1;
 		bool ambientHasBeenReleased = false;
 		bool ambientHasBeenPressed = false;
+
+		bool soundHasBeenReleased[totRows][totColumns];
+		bool soundHasBeenPressed[totRows][totColumns];
+
 		float targetSpeedAmbient = 2;
-		float timeTransientSpeedAmbient = 1;
+		float timeTransientSpeedAmbient = 3;
 		float ambientReleaseTime = 0;
 		float ambientPressTime = 0;
 		// Draw
