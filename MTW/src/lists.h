@@ -17,14 +17,14 @@ std::vector<int> listTitleNumber = {1,1,1,1,
 
 std::vector<string> listAmbient_T1 = {"A102.wav", "A104.wav", "A105.wav", "A101.wav",
 									"A104.wav","A102.wav","A103.wav","A104.wav",
-									"A102.wav","A104.wav","A101.wav","A102.wav",
-									"A101.wav","A103.wav","A105.wav","A103.wav"};
+									"A103.wav","A104.wav","A101.wav","A102.wav",
+									"A101.wav","A102.wav","A105.wav","A103.wav"};
 
 
-std::vector<float> listAmbient_T1Vol = {0.1,0.1,0.1,0.1,
-					0.1,0.1,0.1,0.1,
-					0.1,0.1,0.1,0.1,
-					0.1,0.1,0.1,0.1};
+std::vector<float> listAmbient_T1Vol = {0.15,0.15,0.15,0.15,
+					0.15,0.15,0.15,0.15,
+					0.15,0.15,0.15,0.15,
+					0.15,0.15,0.15,0.15};
 
 std::vector<string> listAmbient_T2 = {"AT200.wav", "AT201.wav", "AT202.wav", "AT203.wav",
 				"AT210.wav","AT211.wav","AT212.wav","AT213.wav",
@@ -62,7 +62,7 @@ std::vector<string> listSounds_T1 = {"S109.wav", "T1D.wav", "S111.wav", "S112.wa
 								"T1A.wav","S103.wav","S104.wav","S110.wav"};
 
 std::vector<float> listSounds_T1Vol = {1,0.8,0.8,0.3,
-										0.4,0.6,1,1,
+										0.8,0.6,1,1,
 										1,1,0.8,0.7,
 										1,1,0.7,1};
 

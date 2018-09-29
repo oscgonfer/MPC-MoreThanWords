@@ -236,7 +236,7 @@ void ofApp::update(){
 						soundList[row][column].stop();
 						soundList[row][column].play();
 						timeLastReleased[row][column] = ofGetElapsedTimef();
-
+						
 						soundList[row][column].setVolume(volumeList[row][column]);
 						soundList[row][column].setMultiPlay(false);
 
@@ -257,9 +257,10 @@ void ofApp::update(){
 						soundList[row][column].play();
 						soundList[row][column].setVolume(volumeList[row][column]);
 						soundList[row][column].setLoop(true);
+						soundList[row][column].setSpeed(1);
 
 						indexAmbient = indexList;
-						ambientHasBeenPressed = true;
+						ambientHasBeenPressed = false;
 						ambientHasBeenReleased = false;
 						status = STORY_PRELOAD;
 
@@ -326,7 +327,6 @@ void ofApp::update(){
 						// Load stories
 						soundList[row][column].load(pathtoSound + listSounds[indexList], true);	
 
-						cout << "problem" <<endl;
 						typeList[row][column] = listType[indexList];
 						volumeList[row][column] = listSoundVol[indexList];
 						// TO CHECK WHERE TO PUT THE OTHER AMBIENTS					
@@ -374,7 +374,6 @@ void ofApp::update(){
 
 					// Titles case
 					if (pressed && typeList[row][column] == 3 && lapseOn>timeOnMin && soundHasBeenReleased[row][column]) {
-						cout << "HI" << endl;
 						soundList[row][column].stop();
 						soundList[row][column].play();
 						soundList[row][column].setVolume(volumeList[row][column]);
@@ -406,7 +405,7 @@ void ofApp::update(){
 
 					// Check when ambient has been pressed after released
 					if (pressed && indexList == indexAmbient && ambientHasBeenReleased) {
-						ambientHasBeenPressed = true;
+						ambientHasBeenPressed = false;
 						ambientHasBeenReleased = false;
 						ambientPressTime = ofGetElapsedTimef();
 					}
@@ -445,7 +444,7 @@ void ofApp::update(){
 
 							if (typeList[row][column]==2){
 								// The sound type is loop
-								soundList[row][column].setLoop(true);
+								soundList[row][column].setLoop(false);
 								soundList[row][column].setMultiPlay(false);
 
 							} else if (typeList[row][column]==1) {

@@ -61,7 +61,7 @@ class ofApp : public ofBaseApp{
 		float timeOffMin = 0.1; // Minimum time off for replay
 		float timeOnMin = 0.2; // Minimum time off for replay
 
-		int timeFadeOut = 5; // Time in seconds to fade out
+		int timeFadeOut = 3; // Time in seconds to fade out
 		float speedAmbient = 1;
 		bool ambientHasBeenReleased = false;
 		bool ambientHasBeenPressed = false;
@@ -69,8 +69,8 @@ class ofApp : public ofBaseApp{
 		bool soundHasBeenReleased[totRows][totColumns];
 		bool soundHasBeenPressed[totRows][totColumns];
 
-		float targetSpeedAmbient = 2;
-		float timeTransientSpeedAmbient = 3;
+		float targetSpeedAmbient = 1.03;
+		float timeTransientSpeedAmbient = 2;
 		float ambientReleaseTime = 0;
 		float ambientPressTime = 0;
 		// Draw
