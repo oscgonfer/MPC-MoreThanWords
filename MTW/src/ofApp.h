@@ -62,11 +62,11 @@ class ofApp : public ofBaseApp{
 		float timeLeftFadeOut[totRows][totColumns];
 		float timeStartFadeOut[totRows][totColumns];
 		float targetFactor[totRows][totColumns];
-		int timeFadeOut = 3; // Time in seconds to fade out looping sounds
+		float timeFadeOut = 0.1; // Time in seconds to fade out looping sounds
 
 
-		float timeOffMin = 0.1; // Minimum time off for replay
-		float timeOnMin = 0.2; // Minimum time off for replay
+		float timeOffMin = 0.5; // Minimum time off for replay
+		float timeOnMin = 0.5; // Minimum time off for replay
 
 		bool soundLoaded = false;
 
@@ -78,7 +78,7 @@ class ofApp : public ofBaseApp{
 		bool ambientHasBeenReleased = false;
 		bool ambientHasBeenPressed = false;
 		bool ambientHasBeenOnceReleased = false;
-		float targetSpeedAmbient = 1.03;
+		float targetSpeedAmbient = 1.5;
 		float timeTransientSpeedAmbient = 2;
 		float ambientReleaseTime = 0;
 		float ambientPressTime = 0;

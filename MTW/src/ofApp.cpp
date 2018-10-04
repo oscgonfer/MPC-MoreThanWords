@@ -80,6 +80,7 @@ void ofApp::update(){
 	// look for the '\n' character
 	int pos1 = 0;
 	bool reset = true;
+	int sumPressed = 0;
 	for (int i = 0; i < bytesRequired; i++) {
         if ((bytes[i]== '\n') && pos1 == 0) {
             pos1 = i;
@@ -96,15 +97,20 @@ void ofApp::update(){
 
 		if (bytes[pos1 + i + 1] == '1') {
     		arrayButton[row][column] = true;
+    		sumPressed ++;
     	} else {
-    		reset = false;
     		arrayButton[row][column] = false;
      		if (pressed) {
-				timeLastReleased[row][column] = ofGetElapsedTimef();
+				// timeLvastReleased[row][column] = ofGetElapsedTimef();
 				// timeLastPressed[row][column] = ofGetElapsedTimef();
 				soundHasBeenPressed[row][column] = true;
 			} 
     	}
+
+	}
+
+	if (sumPressed < 8) {
+		reset = false;
 	}
 
 	// Define reset status
@@ -133,11 +139,14 @@ void ofApp::update(){
 					// No time constraint
 					timeLastReleased[row][column] = 0;
 					soundHasBeenPressed[row][column] = false;
+					soundHasBeenReleased[row][column] = true;
+
 					timeLastPressed[row][column] = 0;
 					fadingOut[row][column] = false;
 					timeLeftFadeOut[row][column] = 0;
 					timeStartFadeOut[row][column] = 0;
 					targetFactor[row][column] = 1;
+
 				}
 			} 
 
@@ -221,12 +230,15 @@ void ofApp::update(){
 						soundList[row][column].unload();
 						// Load ambients
 						soundLoaded = soundLoaded && soundList[row][column].load(pathtoSound + listAmbient[indexList], true);	
+					
 						volumeList[row][column] = listAmbientVol[indexList];				
 					}
 				}
 			} 
 
 			if (soundLoaded) {
+				cout << indexTitle << endl;
+
 				cout << "Ambient loading successful" << endl;
 			}
 
@@ -258,12 +270,15 @@ void ofApp::update(){
 					if (indexList == indexTitle) {
 
 						if (!pressed && lapseOff > timeOffMin && soundHasBeenPressed[row][column]) {
+							cout << "indexTitle" << indexTitle << "not pressed" <<endl;
 							soundHasBeenPressed[row][column] = false;
 							soundHasBeenReleased[row][column] = true;
 							timeLastReleased[row][column]=ofGetElapsedTimef();
 						}
 
 						if (pressed && lapseOn > timeOnMin && soundHasBeenReleased[row][column]) {
+							cout << "indexTitle" << indexTitle << "pressed" <<endl;
+
 							soundList[row][column].stop();
 							soundList[row][column].play();
 							
@@ -343,21 +358,21 @@ void ofApp::update(){
 					// Unload everything except the title and ambient
 					if (indexList!=indexTitle && indexList!=indexAmbient) {
 						soundList[row][column].unload();
-					}
 
-					// Unload everything except the title and ambient
-					if (indexList!=indexTitle && indexList!=indexAmbient) {
 						// Load stories
 						soundLoaded = soundLoaded && soundList[row][column].load(pathtoSound + listSounds[indexList], true);	
-
-						typeList[row][column] = listType[indexList];
 						volumeList[row][column] = listSoundVol[indexList];
-						// TO CHECK WHERE TO PUT THE OTHER AMBIENTS					
+					
 					}
+					
+					typeList[row][column] = listType[indexList];
+					// TO CHECK WHERE TO PUT THE OTHER AMBIENTS					
+					
 				}
 			}
 
 			if (soundLoaded) {
+				cout << indexTitle << endl;
 				cout << "Story loading successful" << endl;
 			}
 			
@@ -396,13 +411,15 @@ void ofApp::update(){
 					if (typeList[row][column] == 1 && indexList!=indexAmbient) {
 
 						// Check if pressed or released
-						if (!pressed && lapseOff >timeOffMin && soundHasBeenPressed[row][column]){
+						if (!pressed && lapseOff > timeOffMin && soundHasBeenPressed[row][column]){
+
 							soundHasBeenReleased[row][column] = true;
 							soundHasBeenPressed[row][column] = false;
 							timeLastReleased[row][column] = ofGetElapsedTimef();
 						}
 
-						if (pressed && lapseOn>timeOnMin && soundHasBeenReleased[row][column]) {
+						if (pressed && lapseOn > timeOnMin && soundHasBeenReleased[row][column]) {
+
 							soundList[row][column].stop();
 							soundList[row][column].play();
 
@@ -414,7 +431,6 @@ void ofApp::update(){
 							timeLastPressed[row][column] = ofGetElapsedTimef();
 							soundList[row][column].setLoop(false);
 						}
-
 					}
 
 					// Loop case
@@ -485,7 +501,7 @@ void ofApp::update(){
 							ambientHasBeenReleased = true;
 							ambientHasBeenPressed = false;
 
-							if (!ambientHasBeenReleased) {
+							if (!ambientHasBeenOnceReleased) {
 								ambientHasBeenOnceReleased = true;
 							}
 
@@ -524,30 +540,48 @@ void ofApp::update(){
 			float timeLeftFadeOutAll = 0;
 			float timeStartFadeOutAll = 0;
 			float targetFactorAll = 1;
+			bool actuallyReset = false;
 			
 			// Set time left for fade out as max time for fade out
 			timeLeftFadeOutAll = timeFadeOutAll;
 			// Get time at which we will start fading out
 			timeStartFadeOutAll = ofGetElapsedTimef(); 
+			for (int i=0;i<totColumns;i++){
+				for (int j=0;j<totRows;j++){
+					if (timeLastReleased[j][i] > 0) {
+						actuallyReset = true;
+					}
+				}
+			}
 
-			while (timeLeftFadeOutAll>0) {
-				// Re calculate time left
-				timeLeftFadeOutAll = timeFadeOutAll - (ofGetElapsedTimef() - timeStartFadeOutAll);
-				// Calculate the target volume
-				targetFactorAll = timeLeftFadeOutAll/timeFadeOutAll;
+			if (actuallyReset) {
 
-				for (int row = 0; row < totRows; row++){
-					for (int column = 0; column < totColumns; column++){
-						soundList[row][column].setLoop(false);
-						if (targetFactorAll < 0) {
-							soundList[row][column].stop();
-						} else {
-							soundList[row][column].setVolume(targetFactorAll*volumeList[row][column]);
+				while (timeLeftFadeOutAll>0) {
+					// Re calculate time left
+					timeLeftFadeOutAll = timeFadeOutAll - (ofGetElapsedTimef() - timeStartFadeOutAll);
+					// Calculate the target volume
+					targetFactorAll = fmin(1, timeLeftFadeOutAll/timeFadeOutAll);
+
+					for (int row = 0; row < totRows; row++){
+						for (int column = 0; column < totColumns; column++){
+							soundList[row][column].setLoop(false);
+
+							if (targetFactorAll*volumeList[row][column] < 0.01) {
+								soundList[row][column].stop();
+							} else {
+								soundList[row][column].setVolume(targetFactorAll*volumeList[row][column]);
+							}
+							
+							timeLastReleased[row][column] = 0;
+
 						}
 					}
 				}
 			}
-		
+
+
+    		// Serial.flush();
+
 			status = TITLE_PRELOAD;
 
 			break;
@@ -559,15 +593,13 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
 
-
 	if (viewGraph) {
 		for (int i = 0; i<totRows; i++){
 			for (int j = 0; j<totColumns; j++) {
 
-				bool pressed = arrayButton[i][j];
+				bool pressed = arrayButton[j][i];
 
 				if (pressed) {
-					// cout << i << " - " << j << " - " << pressed;
 					ofSetColor(248,35,114);
 				} else {
 					ofSetColor(235,237,239);
@@ -583,43 +615,42 @@ void ofApp::draw(){
 
 	    		ofDrawRectangle(rect);
 
-	   //  		// Text in center if is playing
-	   //  		int textOnX = rect.x + rectSide/2;
-	   //  		int textOnY = rect.y + rectSide/2;
+	    		// Text in center if is playing
+	    		int textOnX = rect.x + rectSide/2;
+	    		int textOnY = rect.y + rectSide/2;
 
-	   //  		bool playing;
-	   //  		playing = soundList[i][j].isPlaying();
+	    		bool playing;
+	    		playing = soundList[j][i].isPlaying();
 				ofSetColor(40,41,35);
-	   //  		stringstream text;
-	   //  		if (playing) {
-	   //  			text << "ON" << endl;
-	   //  		} else {
-	   //  			text << "OFF" << endl;
-	   //  		}
+	    		stringstream text;
+	    		if (playing) {
+	    			text << "ON" << endl;
+	    		} else {
+	    			text << "OFF" << endl;
+	    		}
 
-	   //          ofDrawBitmapString(text.str(), textOnX, textOnY);
+	            ofDrawBitmapString(text.str(), textOnX, textOnY);
 
 	            // Text below for time last released
 	            int textReleasedX = rect.x + rectSide/10;
 	    		int textReleasedY = rect.y + rectSide/10; 
 
-	    		float time = timeLastReleased[i][j];
+	    		float time = timeLastReleased[j][i];
 	    		stringstream textTime;
 	    		textTime << "Time Rel: " << time << endl;
 
 				ofDrawBitmapString(textTime.str(), textReleasedX, textReleasedY);
 
-				// // Text below for time last released
-	   //          int textSpeedX = rect.x + rectSide/10;
-	   //  		int textSpeedY = rect.y + 8*rectSide/10; 
+				// Text below for speed
+	            int textSpeedX = rect.x + rectSide/10;
+	    		int textSpeedY = rect.y + 8*rectSide/10; 
 
+				float speed = 0;
+	    		speed = soundList[j][i].getSpeed();
+	    		stringstream textSpeed;
+	    		textSpeed << "Speed: " << speed << endl;
 
-				// float speed = 0;
-	   //  		speed = soundList[i][j].getSpeed();
-	   //  		stringstream textSpeed;
-	   //  		textSpeed << "Speed: " << speed << endl;
-
-				// ofDrawBitmapString(textSpeed.str(), textSpeedX, textSpeedY);
+				ofDrawBitmapString(textSpeed.str(), textSpeedX, textSpeedY);
 			}
 		}
 	}
