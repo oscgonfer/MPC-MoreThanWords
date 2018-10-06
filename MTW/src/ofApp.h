@@ -62,7 +62,7 @@ class ofApp : public ofBaseApp{
 		float timeLeftFadeOut[totRows][totColumns];
 		float timeStartFadeOut[totRows][totColumns];
 		float targetFactor[totRows][totColumns];
-		float timeFadeOut = 0.1; // Time in seconds to fade out looping sounds
+		float timeFadeOut = 3; // Time in seconds to fade out looping sounds
 
 
 		float timeOffMin = 0.5; // Minimum time off for replay
@@ -71,7 +71,7 @@ class ofApp : public ofBaseApp{
 		bool soundLoaded = false;
 
 		// Fade Out when reset button is pressed
-		int timeFadeOutAll = 3; // Time in seconds to fade out
+		int timeFadeOutAll = 1; // Time in seconds to fade out
 
 		// Ambient specifics
 		float speedAmbient = 1;

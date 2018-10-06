@@ -270,14 +270,12 @@ void ofApp::update(){
 					if (indexList == indexTitle) {
 
 						if (!pressed && lapseOff > timeOffMin && soundHasBeenPressed[row][column]) {
-							cout << "indexTitle" << indexTitle << "not pressed" <<endl;
 							soundHasBeenPressed[row][column] = false;
 							soundHasBeenReleased[row][column] = true;
 							timeLastReleased[row][column]=ofGetElapsedTimef();
 						}
 
 						if (pressed && lapseOn > timeOnMin && soundHasBeenReleased[row][column]) {
-							cout << "indexTitle" << indexTitle << "pressed" <<endl;
 
 							soundList[row][column].stop();
 							soundList[row][column].play();
@@ -348,6 +346,8 @@ void ofApp::update(){
 					break;
 			}
 
+			cout << "Selected Story " << storyNumber << endl;
+
 			soundLoaded = true;
 
 			for (int row = 0; row < totRows; row++){
@@ -360,19 +360,17 @@ void ofApp::update(){
 						soundList[row][column].unload();
 
 						// Load stories
-						soundLoaded = soundLoaded && soundList[row][column].load(pathtoSound + listSounds[indexList], true);	
+						soundLoaded = soundLoaded && soundList[row][column].load(pathtoSound + listSounds[indexList]);	
 						volumeList[row][column] = listSoundVol[indexList];
 					
 					}
 					
 					typeList[row][column] = listType[indexList];
-					// TO CHECK WHERE TO PUT THE OTHER AMBIENTS					
 					
 				}
 			}
 
 			if (soundLoaded) {
-				cout << indexTitle << endl;
 				cout << "Story loading successful" << endl;
 			}
 			
@@ -442,7 +440,7 @@ void ofApp::update(){
 
 								soundList[row][column].setLoop(true);
 								fadingOut[row][column] = false;
-								soundList[row][column].setVolume(1.0f);
+								soundList[row][column].setVolume(volumeList[row][column]);
 
 
 							} else {
@@ -455,7 +453,7 @@ void ofApp::update(){
 									targetFactor[row][column] = timeLeftFadeOut[row][column]/timeFadeOut;
 
 									
-									if (targetFactor[row][column] < 0.1f) {
+									if (targetFactor[row][column]*volumeList[row][column] < 0.01f) {
 										soundList[row][column].stop();
 										fadingOut[row][column] = false;
 									} else {
