@@ -17,3 +17,5 @@ platformio.ini
 */obj
 
 /docs/_site 
+
+/audios/*
