@@ -563,7 +563,8 @@ void ofApp::update(){
 					for (int row = 0; row < totRows; row++){
 						for (int column = 0; column < totColumns; column++){
 							soundList[row][column].setLoop(false);
-
+							soundList[row][column].setSpeed(1);
+							
 							if (targetFactorAll*volumeList[row][column] < 0.01) {
 								soundList[row][column].stop();
 							} else {
