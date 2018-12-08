@@ -3,11 +3,19 @@
 #include "ofMain.h"
 #include "ofSoundPlayer.h"
 #include "ofxSimpleSerial.h"
+#include "ofxNetwork.h"
+#include "ofxOsc.h"
+
+
 #include <sstream>
 #include <string>
 
 #include <math.h> //floor
 #include <list> //list
+
+#define HOST "localhost"
+#define PORT_OSC_SENDER_PYTHON 8000
+#define PORT_OSC_RECEIVER_PYTHON 53000
 
 using namespace std;
 
@@ -23,16 +31,12 @@ class ofApp : public ofBaseApp{
 
 		enum GLOBAL_STATUS
 		{
-			AMBIENT_PRELOAD,
-			AMBIENT_LOADED,
 			FADE_OUT_AND_STOP,
 			STORY_PRELOAD,
-			STORY_LOADED,
-			TITLE_PRELOAD,
-			TITLE_LOADED
+			STORY_LOADED
 		};
 
-		GLOBAL_STATUS status = TITLE_PRELOAD;
+		GLOBAL_STATUS status = STORY_PRELOAD;
 
 		// Global constants
 		#define totRows 4
@@ -92,5 +96,12 @@ class ofApp : public ofBaseApp{
 		//SERIAL
     	ofSerial Serial;
     	ofSerialDeviceInfo SerialInfo;
+
+    	// UDP
+		ofxUDPManager udpConnection;
+
+		// used for sending the osc messages to qlab
+    	ofxOscSender sender_PYTHON;
+    	ofxOscReceiver receiver_PYTHON;
     
 };

@@ -8,7 +8,7 @@
 
 void ofApp::setup(){
 
-	status = TITLE_PRELOAD;
+	status = STORY_PRELOAD;
 
 	//Serial
     Serial.listDevices();
@@ -35,16 +35,27 @@ void ofApp::setup(){
 			targetFactor[row][column] = 1;
     	}
     }
+
+	//create the socket and set to send to 127.0.0.1:11999
+	ofxUDPSettings settings;
+	// Pi address? 192.168.43.48
+	settings.sendTo("127.0.0.1", 11999);
+	settings.blocking = false;
+
+	udpConnection.Setup(settings);
+
+	// OSC Sender
+	sender_PYTHON.setup(HOST, PORT_OSC_SENDER_PYTHON);
+
+	// OSC Receiver
+	receiver_PYTHON.setup(PORT_OSC_RECEIVER_PYTHON);
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
 
 	bool pressed;
-	bool istitleplaying;
-	bool isambientplaying;
 	int indexList;
-	float speedAmbient;
 
 	// Read Serial
 	int bytesRequired = 33;
@@ -52,8 +63,7 @@ void ofApp::update(){
 	int bytesRemaining = bytesRequired;
 
 	// Serial - loop until we've read everything
-	while (bytesRemaining > 0)
-	{
+	while (bytesRemaining > 0) {
 		// check for OF_SERIAL_NO_DATA
 	  	if ( Serial.available() > 0 ) {
 	    // try to read - note offset into the bytes[] array, this is so
@@ -106,7 +116,6 @@ void ofApp::update(){
 				soundHasBeenPressed[row][column] = true;
 			} 
     	}
-
 	}
 
 	if (sumPressed < 8) {
@@ -120,234 +129,43 @@ void ofApp::update(){
     	reset = false;
     }
 
+    // OSC
+    while(receiver_PYTHON.hasWaitingMessages()){
+    	cout << "hasWaitingMessages" << endl; 
+    	// get the next message
+		ofxOscMessage m;
+		receiver_PYTHON.getNextMessage(m);
+
+		if(m.getAddress() == "/sound"){
+			int new_sound;
+			int type_sound;
+			new_sound = m.getArgAsInt32(0);
+			type_sound = m.getArgAsInt32(1);
+
+			int row = floor(new_sound/totRows);
+			int column = new_sound-row*totRows;
+
+			soundLoaded = true;
+
+			soundLoaded = soundLoaded && soundList[row][column].load(pathtoSound + listSounds[new_sound], true);
+			volumeList[row][column] = listSoundsVol[new_sound];
+			typeList[row][column] = type_sound;
+			
+			if (soundLoaded) {
+				cout << "Reloading " << ofToString(new_sound) << " with type " << ofToString(type_sound) << " successful" << endl;
+			}
+
+		}
+
+    }
+
     // 'State machine'
 	switch (status) {
 		
-		case TITLE_PRELOAD:
-		{
-			indexTitle = -1;
-			indexAmbient = -1;
-			soundLoaded = true;
-
-			for (int row = 0; row < totRows; row++){
-				for (int column = 0; column < totColumns; column++){
-
-					indexList = row * totRows + column;
-					arrayButton[row][column] = false;
-					soundLoaded = soundLoaded && soundList[row][column].load(pathtoSound + soundListTitle[indexList], true);
-					volumeList[row][column] = soundListTitleVol[indexList];
-					// No time constraint
-					timeLastReleased[row][column] = 0;
-					soundHasBeenPressed[row][column] = false;
-					soundHasBeenReleased[row][column] = true;
-
-					timeLastPressed[row][column] = 0;
-					fadingOut[row][column] = false;
-					timeLeftFadeOut[row][column] = 0;
-					timeStartFadeOut[row][column] = 0;
-					targetFactor[row][column] = 1;
-
-				}
-			} 
-
-			if (soundLoaded) {
-				cout << "Title loading successful" << endl;
-			}
-
-			status = TITLE_LOADED;
-			
-			break;
-		}
-		
-		case TITLE_LOADED:
-		{
-			for (int row = 0; row < totRows; row++){
-				for (int column = 0; column < totColumns; column++){
-
-					pressed = arrayButton[row][column];
-
-					// Time Pressed check
-
-					if (pressed) {
-						soundList[row][column].stop();
-						soundList[row][column].play();
-						timeLastPressed[row][column] = ofGetElapsedTimef();
-
-						soundList[row][column].setVolume(volumeList[row][column]);
-						soundList[row][column].setMultiPlay(false);
-						soundList[row][column].setLoop(false);
-
-						soundHasBeenReleased[row][column] = false;
-						soundHasBeenPressed[row][column] = true;
-
-						indexTitle = row * totRows + column;
-						storyNumber = listTitleNumber[indexTitle];
-						
-						status = AMBIENT_PRELOAD;
-
-						break;
-					}
-				}
-			} 
-
-			break;
-		}
-
-		case AMBIENT_PRELOAD:
-		{
-			// Define list Ambient from title selected
-			std::vector<string> listAmbient;
-			std::vector<float> listAmbientVol;
-
-			switch (storyNumber){
-				case 1:
-					listAmbient = listAmbient_T1;
-					listAmbientVol = listAmbient_T1Vol;
-					break;
-				case 2:
-					listAmbient = listAmbient_T2;
-					listAmbientVol = listAmbient_T2Vol;
-					break;
-				case 3: 
-					listAmbient = listAmbient_T3;
-					listAmbientVol = listAmbient_T3Vol;
-					break;
-				case 4: 
-					listAmbient = listAmbient_T4;
-					listAmbientVol = listAmbient_T4Vol;
-					break;
-			}
-
-			soundLoaded = true;
-
-			for (int row = 0; row < totRows; row++){
-				for (int column = 0; column < totColumns; column++){
-
-					indexList = row * totRows + column;
-					
-					// Unload everything except the title
-					if (indexList!=indexTitle) {
-						soundList[row][column].unload();
-						// Load ambients
-						soundLoaded = soundLoaded && soundList[row][column].load(pathtoSound + listAmbient[indexList], true);	
-					
-						volumeList[row][column] = listAmbientVol[indexList];				
-					}
-				}
-			} 
-
-			if (soundLoaded) {
-				cout << indexTitle << endl;
-
-				cout << "Ambient loading successful" << endl;
-			}
-
-			status = AMBIENT_LOADED;
-			
-			break;
-		}
-
-		case AMBIENT_LOADED:
-		{
-			// Check if title is playing
-			rowTitle = floor(indexTitle/totRows);
-			colTitle = indexTitle-rowTitle*totRows;
-
-			istitleplaying = soundList[rowTitle][colTitle].isPlaying();
-
-			for (int row = 0; row < totRows; row++){
-				for (int column = 0; column < totColumns; column++){
-
-					pressed = arrayButton[row][column];
-
-					indexList = row * totRows + column;
-
-					// Time Pressed check
-					float lapseOff = ofGetElapsedTimef() - timeLastReleased[row][column];
-					float lapseOn = ofGetElapsedTimef() - timeLastPressed[row][column];
-
-					// Title case
-					if (indexList == indexTitle) {
-
-						if (!pressed && lapseOff > timeOffMin && soundHasBeenPressed[row][column]) {
-							soundHasBeenPressed[row][column] = false;
-							soundHasBeenReleased[row][column] = true;
-							timeLastReleased[row][column]=ofGetElapsedTimef();
-						}
-
-						if (pressed && lapseOn > timeOnMin && soundHasBeenReleased[row][column]) {
-
-							soundList[row][column].stop();
-							soundList[row][column].play();
-							
-							soundList[row][column].setVolume(volumeList[row][column]);
-							soundList[row][column].setMultiPlay(false);
-							soundList[row][column].setLoop(false);
-
-							timeLastPressed[row][column]=ofGetElapsedTimef();
-							soundHasBeenPressed[row][column]=true;
-							soundHasBeenReleased[row][column]=false;
-
-							break;
-						}
-
-					} else {
-						// Trigger ambient
-						if (pressed) {
-							soundList[row][column].play();
-							soundList[row][column].setVolume(volumeList[row][column]);
-							soundList[row][column].setLoop(true);
-							soundList[row][column].setSpeed(1);
-
-							indexAmbient = indexList;
-							ambientHasBeenPressed = true;
-							ambientHasBeenReleased = false;
-							ambientHasBeenOnceReleased = false;
-							status = STORY_PRELOAD;
-
-							break;
-						}
-					}
-				}
-			}
-			break;
-		}
 		case STORY_PRELOAD:
 		{
-			// Define list sounds
-			std::vector<string> listSounds;
-			std::vector<int> listType;
-			std::vector<float> listSoundVol;
 
-			switch (storyNumber){
-				case 1:
-					listSounds = listSounds_T1;
-					listType = listSoundsTypes_T1;
-					listSoundVol = listSounds_T1Vol;
-
-					break;
-				case 2:
-					listSounds = listSounds_T2;
-					listType = listSoundsTypes_T2;
-					listSoundVol = listSounds_T2Vol;
-
-					break;
-				case 3: 
-					listSounds = listSounds_T3;
-					listType = listSoundsTypes_T3;
-					listSoundVol = listSounds_T3Vol;
-
-					break;
-				case 4: 
-					listSounds = listSounds_T4;
-					listType = listSoundsTypes_T4;
-					listSoundVol = listSounds_T4Vol;
-
-					break;
-			}
-
-			cout << "Selected Story " << storyNumber << endl;
-
+			cout << "Loading stories" << endl;
 			soundLoaded = true;
 
 			for (int row = 0; row < totRows; row++){
@@ -355,18 +173,10 @@ void ofApp::update(){
 
 					indexList = row * totRows + column;
 
-					// Unload everything except the title and ambient
-					if (indexList!=indexTitle && indexList!=indexAmbient) {
-						soundList[row][column].unload();
-
-						// Load stories
-						soundLoaded = soundLoaded && soundList[row][column].load(pathtoSound + listSounds[indexList]);	
-						volumeList[row][column] = listSoundVol[indexList];
-					
-					}
-					
-					typeList[row][column] = listType[indexList];
-					
+					// Load stories
+					soundLoaded = soundLoaded && soundList[row][column].load(pathtoSound + listSounds[indexList], true);	
+					volumeList[row][column] = listSoundsVol[indexList];
+					typeList[row][column] = listSoundsTypes[indexList];
 				}
 			}
 
@@ -382,19 +192,6 @@ void ofApp::update(){
 		case STORY_LOADED:
 		{
 
-			// Check if title is playing
-			rowTitle = floor(indexTitle/totRows);
-			colTitle = indexTitle-rowTitle*totRows;
-
-			istitleplaying = soundList[rowTitle][colTitle].isPlaying();
-
-			// Check if ambient is playing
-			rowAmbient = floor(indexAmbient/totRows);
-			colAmbient = indexAmbient-rowAmbient*totRows;
-
-			isambientplaying = soundList[rowAmbient][colAmbient].isPlaying();
-			speedAmbient = soundList[rowAmbient][colAmbient].getSpeed();
-
 			for (int row = 0; row < totRows; row++){
 				for (int column = 0; column < totColumns; column++){
 
@@ -406,7 +203,7 @@ void ofApp::update(){
 					float lapseOn = ofGetElapsedTimef() - timeLastPressed[row][column];
 
 					// Single or title case
-					if (typeList[row][column] == 1 && indexList!=indexAmbient) {
+					if (typeList[row][column] == 1) {
 
 						// Check if pressed or released
 						if (!pressed && lapseOff > timeOffMin && soundHasBeenPressed[row][column]){
@@ -432,7 +229,7 @@ void ofApp::update(){
 					}
 
 					// Loop case
-					if (typeList[row][column] == 2 && indexList!=indexAmbient && indexList!=indexTitle) {
+					if (typeList[row][column] == 2) {
 
 						if (soundList[row][column].isPlaying()){
 
@@ -483,50 +280,6 @@ void ofApp::update(){
 
 						}
 					}
-
-					if (indexList == indexAmbient){
-						// Case when ambient is done on it's own
-						if (pressed && !isambientplaying) {
-							soundList[row][column].play();
-							soundList[row][column].setVolume(volumeList[row][column]);
-							soundList[row][column].setMultiPlay(false);
-							soundList[row][column].setSpeed(1.0f);
-						}
-
-						// Check when ambient has been released after pressed
-						if (!pressed && ambientHasBeenPressed){
-							// Ambient has been released
-							ambientHasBeenReleased = true;
-							ambientHasBeenPressed = false;
-
-							if (!ambientHasBeenOnceReleased) {
-								ambientHasBeenOnceReleased = true;
-							}
-
-							ambientReleaseTime = ofGetElapsedTimef();
-						}
-
-						// Check when ambient has been pressed after released
-						if (pressed && ambientHasBeenReleased) {
-							ambientHasBeenPressed = true;
-							ambientHasBeenReleased = false;
-							ambientPressTime = ofGetElapsedTimef();
-						}
-
-						// Change speed of ambient in case of release
-						if (!pressed && ambientHasBeenReleased && speedAmbient > 1 && isambientplaying) {
-							float newSpeedAmbient = fmax(1, targetSpeedAmbient - (ofGetElapsedTimef() - ambientReleaseTime)/timeTransientSpeedAmbient);
-							// Put speed back to normal
-							soundList[row][column].setSpeed(newSpeedAmbient);
-						}
-
-						// Change speed of ambient in case of re-press
-						if (pressed && ambientHasBeenPressed && isambientplaying && ambientHasBeenOnceReleased) {
-							float newSpeedAmbient = fmin(targetSpeedAmbient, (ofGetElapsedTimef()-ambientPressTime)/timeTransientSpeedAmbient + 1);
-							// Set the desired speed
-							soundList[row][column].setSpeed(newSpeedAmbient);
-						}
-					}
 				}
 			}
 
@@ -552,7 +305,15 @@ void ofApp::update(){
 				}
 			}
 
+			// SEND MESSAGE TO PYTHON CODE
+    		ofxOscMessage m;
+	        m.setAddress("/reset");
+	        m.addFloatArg(999);
+	        
+	        sender_PYTHON.sendMessage(m);
+
 			if (actuallyReset) {
+				cout << "ACTUALLY RESET" << endl;
 
 				while (timeLeftFadeOutAll>0) {
 					// Re calculate time left
@@ -581,12 +342,11 @@ void ofApp::update(){
 
     		// Serial.flush();
 
-			status = TITLE_PRELOAD;
+			status = STORY_PRELOAD;
 
 			break;
 		}
 	}
-
 }
 
 //--------------------------------------------------------------
