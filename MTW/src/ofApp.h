@@ -5,8 +5,6 @@
 #include "ofxSimpleSerial.h"
 #include "ofxNetwork.h"
 #include "ofxOsc.h"
-
-
 #include <sstream>
 #include <string>
 
@@ -54,6 +52,7 @@ class ofApp : public ofBaseApp{
 
 		// If pressed or not
 		bool arrayButton[totRows][totColumns];
+		bool updatedButton[totRows][totColumns];
 
 		ofSoundPlayer soundList[totRows][totColumns];
 		int typeList[totRows][totColumns]; // 1: single / 2: loop / 3: ambient relocated

@@ -1,4 +1,4 @@
-string pathtoSound = "/Users/macoscar/Documents/04_Projects/03_ArtWork/of_v0.10.0_osx_release/apps/myApps/TWITTER_YT/vids/";
+string pathtoSound = "/Users/macoscar/Documents/04_Projects/03_ArtWork/of_v0.10.0_osx_release/apps/myApps/MTW_PY_LIVE/vids/";
 
 // string pathtoSound = "/Users/rebecca/Desktop/MORE_THAN_WORDS_OPEN_STUDIO/NEW_NAMED/";
 

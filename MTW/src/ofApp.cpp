@@ -27,6 +27,7 @@ void ofApp::setup(){
     for (int row = 0; row< totRows; row ++) {
     	for (int column = 0; column<totColumns; column++ ){
     		arrayButton[row][column] = false;
+    		updatedButton[row][column] = false;
     		soundHasBeenPressed[row][column] = false;
     		soundHasBeenReleased[row][column] = true;
     		fadingOut[row][column] = false;
@@ -39,7 +40,7 @@ void ofApp::setup(){
 	//create the socket and set to send to 127.0.0.1:11999
 	ofxUDPSettings settings;
 	// Pi address? 192.168.43.48
-	settings.sendTo("127.0.0.1", 11999);
+	settings.sendTo("169.254.244.167", 11999);
 	settings.blocking = false;
 
 	udpConnection.Setup(settings);
@@ -75,7 +76,7 @@ void ofApp::update(){
 	    // check for error code
 	    if ( result == OF_SERIAL_ERROR ) {
 	    	// something bad happened
-	    	ofLog( OF_LOG_ERROR, "unrecoverable error reading from serial" );
+	    	ofLog( OF_LOG_ERROR, "Unrecoverable error reading from serial" );
 	      	// bail out
 	    	break;
 	    } else if ( result == OF_SERIAL_NO_DATA ) {
@@ -98,12 +99,13 @@ void ofApp::update(){
     }
 
     // Check who has been pressed
-	for (int i = 0; i < 16; i++) {
+	for (int i = 0; i < totColumns*totRows; i++) {
 
 		int row = floor(i/totRows);
 		int column = i-row*totRows;
 
 		pressed = arrayButton[row][column];
+		updatedButton[row][column] = false;
 
 		if (bytes[pos1 + i + 1] == '1') {
     		arrayButton[row][column] = true;
@@ -131,33 +133,49 @@ void ofApp::update(){
 
     // OSC
     while(receiver_PYTHON.hasWaitingMessages()){
-    	cout << "hasWaitingMessages" << endl; 
+    	cout << "OSC has waiting messages" << endl; 
     	// get the next message
 		ofxOscMessage m;
 		receiver_PYTHON.getNextMessage(m);
 
 		if(m.getAddress() == "/sound"){
-			int new_sound;
-			int type_sound;
-			new_sound = m.getArgAsInt32(0);
-			type_sound = m.getArgAsInt32(1);
 
-			int row = floor(new_sound/totRows);
-			int column = new_sound-row*totRows;
+			int new_sound = m.getArgAsInt32(0);
+			int type_sound = m.getArgAsInt32(1);
+
+			int row_new_sound = floor(new_sound/totRows);
+			int column_new_sound = new_sound-row_new_sound*totRows;
 
 			soundLoaded = true;
 
-			soundLoaded = soundLoaded && soundList[row][column].load(pathtoSound + listSounds[new_sound], true);
-			volumeList[row][column] = listSoundsVol[new_sound];
-			typeList[row][column] = type_sound;
+			soundLoaded = soundLoaded && soundList[row_new_sound][column_new_sound].load(pathtoSound + listSounds[new_sound], true);
+			volumeList[row_new_sound][column_new_sound] = listSoundsVol[new_sound];
+			typeList[row_new_sound][column_new_sound] = type_sound;
 			
 			if (soundLoaded) {
 				cout << "Reloading " << ofToString(new_sound) << " with type " << ofToString(type_sound) << " successful" << endl;
+				updatedButton[row_new_sound][column_new_sound] = true;
 			}
 
 		}
 
     }
+
+    // UDP sender
+    string message="";
+    int row = 0;
+    int column = 0;
+
+	for (int i = 0; i < totColumns*totRows; i++) {
+
+		row = floor(i/totRows);
+		column = i-row*totRows;
+		
+		message+=ofToString(updatedButton[row][column])+"|"+ofToString(arrayButton[row][column])+"[/p]";
+	} 
+
+	udpConnection.Send(message.c_str(),message.length());
+	// cout << "Send message " << message << endl;
 
     // 'State machine'
 	switch (status) {
@@ -418,7 +436,7 @@ void ofApp::draw(){
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
-
+	string message="";
 	switch (key) {
         case 'v':
         	if (!viewGraph){
@@ -427,5 +445,74 @@ void ofApp::keyPressed(int key){
         		viewGraph = false;
         	}
             break;
+
+        // 1-2: minRectPosX ++/--; 3-4: minRectPosY ++/--; 5-6 rectSide ++/--; 7-8 rectOffset ++/--;
+        case '1':
+        	
+        	message = ofToString(key) + "[/p]";
+        	udpConnection.Send(message.c_str(),message.length());
+        	cout << "[Debug] Increase minRectPosx" << endl;
+        	break;
+
+        case '2':
+        	message = ofToString(key) + "[/p]";
+        	udpConnection.Send(message.c_str(),message.length());
+        	cout << "[Debug] Decrease minRectPosx" << endl;
+        	break;
+
+        case '3':
+        	message = ofToString(key) + "[/p]";
+        	udpConnection.Send(message.c_str(),message.length());
+        	cout << "[Debug] Increase minRectPosy" << endl;
+
+        	break;
+
+        case '4':
+        	message = ofToString(key) + "[/p]";
+        	udpConnection.Send(message.c_str(),message.length());
+        	cout << "[Debug] Decrease minRectPosy" << endl;
+        	break;
+
+        case '5':
+        	message = ofToString(key) + "[/p]";
+        	udpConnection.Send(message.c_str(),message.length());
+        	cout << "[Debug] Increase rectSide" << endl;
+        	break;
+
+        case '6':
+        	message = ofToString(key) + "[/p]";
+        	udpConnection.Send(message.c_str(),message.length());
+        	cout << "[Debug] Decrease rectSide" << endl;
+        	break;
+
+        case '7':
+        	message = ofToString(key) + "[/p]";
+        	udpConnection.Send(message.c_str(),message.length());
+        	cout << "[Debug] Increase rectOffset" << endl;
+        	break;
+
+        case '8':
+        	message = ofToString(key) + "[/p]";
+        	udpConnection.Send(message.c_str(),message.length());
+        	cout << "[Debug] Decrease rectOffset" << endl;
+        	break;
+
+        case '9':
+        	message = ofToString(key) + "[/p]";
+        	udpConnection.Send(message.c_str(),message.length());
+        	cout << "[Debug] Decrease rectOffset" << endl;
+        	break;
+
+        case '0':
+        	message = ofToString(key) + "[/p]";
+        	udpConnection.Send(message.c_str(),message.length());
+        	cout << "[Debug] Decrease rectOffset" << endl;
+        	break;
+
+        case 'q':
+        	message = ofToString(key) + "[/p]";
+        	udpConnection.Send(message.c_str(),message.length());
+        	cout << "[Debug] Decrease rectOffset" << endl;
+        	break;
     }
 }
