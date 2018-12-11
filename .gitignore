@@ -11,11 +11,10 @@ platformio.ini
 *.yml
 *.ini
 *.orig
-*/bin
-*.app
 
 */obj
 
-/docs/_site 
+/docs/_site
+/MTW/bin/data* 
 
 /audios/*

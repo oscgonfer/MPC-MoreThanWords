@@ -148,7 +148,9 @@ void ofApp::update(){
 
 			soundLoaded = true;
 
-			soundLoaded = soundLoaded && soundList[row_new_sound][column_new_sound].load(pathtoSound + listSounds[new_sound], true);
+			// soundLoaded = soundLoaded && soundList[row_new_sound][column_new_sound].load(pathtoSound + listSounds[new_sound], true);
+			soundLoaded = soundLoaded && soundList[row_new_sound][column_new_sound].load(listSounds[new_sound], true);
+
 			volumeList[row_new_sound][column_new_sound] = listSoundsVol[new_sound];
 			typeList[row_new_sound][column_new_sound] = type_sound;
 			
@@ -192,7 +194,9 @@ void ofApp::update(){
 					indexList = row * totRows + column;
 
 					// Load stories
-					soundLoaded = soundLoaded && soundList[row][column].load(pathtoSound + listSounds[indexList], true);	
+					// soundLoaded = soundLoaded && soundList[row][column].load(pathtoSound + listSounds[indexList], true);	
+					soundLoaded = soundLoaded && soundList[row][column].load(listSounds[indexList], true);	
+
 					volumeList[row][column] = listSoundsVol[indexList];
 					typeList[row][column] = listSoundsTypes[indexList];
 				}
@@ -476,13 +480,13 @@ void ofApp::keyPressed(int key){
         case '5':
         	message = ofToString(key) + "[/p]";
         	udpConnection.Send(message.c_str(),message.length());
-        	cout << "[Debug] Increase rectSide" << endl;
+        	cout << "[Debug] Increase rectSidex" << endl;
         	break;
 
         case '6':
         	message = ofToString(key) + "[/p]";
         	udpConnection.Send(message.c_str(),message.length());
-        	cout << "[Debug] Decrease rectSide" << endl;
+        	cout << "[Debug] Decrease rectSidex" << endl;
         	break;
 
         case '7':
@@ -500,19 +504,67 @@ void ofApp::keyPressed(int key){
         case '9':
         	message = ofToString(key) + "[/p]";
         	udpConnection.Send(message.c_str(),message.length());
-        	cout << "[Debug] Decrease rectOffset" << endl;
+        	cout << "[Debug] Increase thickness" << endl;
         	break;
 
         case '0':
         	message = ofToString(key) + "[/p]";
         	udpConnection.Send(message.c_str(),message.length());
-        	cout << "[Debug] Decrease rectOffset" << endl;
+        	cout << "[Debug] Decrease thickness" << endl;
         	break;
 
         case 'q':
         	message = ofToString(key) + "[/p]";
         	udpConnection.Send(message.c_str(),message.length());
-        	cout << "[Debug] Decrease rectOffset" << endl;
+        	cout << "[Debug] Print out everything" << endl;
+        	break;
+
+        case 'w':
+        	message = ofToString(key) + "[/p]";
+        	udpConnection.Send(message.c_str(),message.length());
+        	cout << "[Debug] Increase rectSidey" << endl;
+        	break;
+
+        case 'e':
+        	message = ofToString(key) + "[/p]";
+        	udpConnection.Send(message.c_str(),message.length());
+        	cout << "[Debug] Decrease rectSidey" << endl;
+        	break;
+
+        case 'r':
+        	message = ofToString(key) + "[/p]";
+        	udpConnection.Send(message.c_str(),message.length());
+        	cout << "[Debug] Increase anglex" << endl;
+        	break;
+
+        case 't':
+        	message = ofToString(key) + "[/p]";
+        	udpConnection.Send(message.c_str(),message.length());
+        	cout << "[Debug] Decrease anglex" << endl;
+        	break;
+
+        case 'y':
+        	message = ofToString(key) + "[/p]";
+        	udpConnection.Send(message.c_str(),message.length());
+        	cout << "[Debug] Increase angley" << endl;
+        	break;
+        
+        case 'u':
+        	message = ofToString(key) + "[/p]";
+        	udpConnection.Send(message.c_str(),message.length());
+        	cout << "[Debug] Decrease angley" << endl;
+        	break;
+
+        case 'i':
+        	message = ofToString(key) + "[/p]";
+        	udpConnection.Send(message.c_str(),message.length());
+        	cout << "[Debug] Increase anglez" << endl;
+        	break;
+
+        case 'o':
+        	message = ofToString(key) + "[/p]";
+        	udpConnection.Send(message.c_str(),message.length());
+        	cout << "[Debug] Decrease anglez" << endl;
         	break;
     }
 }
