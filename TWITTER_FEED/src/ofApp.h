@@ -5,7 +5,7 @@
 #include "ofUtils.h"
 #include "ofPath.h"
 
-#define json_file_path "/Users/macoscar/Documents/04_Projects/03_ArtWork/of_v0.10.0_osx_release/apps/myApps/MTW_PY_LIVE/tweets_list.json"
+#define json_file_name "tweets_list.json"
 
 class ofApp : public ofBaseApp{
 

@@ -4,7 +4,7 @@
 void ofApp::setup(){
 	ofSetBackgroundColor(0,255,0);
 
-	std::string file = json_file_path;
+	std::string file = json_file_name;
 	ttf.load("verdana.ttf", 12, true, true, true, 0.3f, 0);
 	bool parsingSuccessful = json.open(file);
 
@@ -31,7 +31,7 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
 
-	std::string file = json_file_path;
+	std::string file = json_file_name;
 	std::stringstream ss;
 
 	bool parsingSuccessful = json.open(file);
