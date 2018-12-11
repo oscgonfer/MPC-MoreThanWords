@@ -80,10 +80,16 @@ void ofApp::update(){
 					minRectPosy --;
 					break;
 				case 53:
-					rectSide ++;
+					rectSidex ++;
 					break;
 				case 54:
-					rectSide --;
+					rectSidex --;
+					break;
+				case 119:
+					rectSidey ++;
+					break;
+				case 101:
+					rectSidey --;
 					break;
 				case 55:
 					rectOffset ++;
@@ -98,7 +104,25 @@ void ofApp::update(){
 					thickness --;
 					break;
 				case 113:
-					cout << "minRectPosx " << minRectPosx << " | minRectPosy " << minRectPosy << " | rectSide " << rectSide << " | rectOffset " << rectOffset << " | thickness " << thickness << endl;
+					cout << "minRectPosx " << minRectPosx << " | minRectPosy " << minRectPosy << " | rectSide " << rectSidex << " | rectSidey " << rectSidey << " | anglex "<< anglex << " | angley "<< angley << " | anglez "<< anglez << " | rectOffset " << rectOffset << " | thickness " << thickness << endl;
+					break;
+				case 114:
+					anglex += 0.5;
+					break;
+				case 116:
+					anglex -= 0.5;
+					break;
+				case 121:
+					angley += 0.5;
+					break;
+				case 117:
+					angley -= 0.5;
+					break;
+				case 105:
+					anglez += 0.5;
+					break;
+				case 111:
+					anglez -= 0.5;
 					break;
 			}
 		}
@@ -117,6 +141,10 @@ void ofApp::draw(){
 	float now;
 	bool reset_status = true;
 	now = ofGetElapsedTimef();
+
+	ofRotateXDeg(anglex);
+	ofRotateYDeg(angley);
+	ofRotateZDeg(anglez);
 
 	if (reset_counter == totRows*totColumns) {
 		if (now - resetTime > timeFadeOutAll) {
@@ -158,15 +186,15 @@ void ofApp::draw(){
 			}
 
 			// Draw under white
-			cout << alphaReset << endl;
+			// cout << alphaReset << endl;
 			ofSetColor(255,255,255,alphaReset);
 
 			// ofNoFill();
 			ofRectangle rectW;
-			rectW.x = minRectPosx + i*(rectSide + rectOffset);
-			rectW.y = minRectPosy + j*(rectSide + rectOffset);
-			rectW.width = rectSide;
-			rectW.height = rectSide;
+			rectW.x = minRectPosx + i*(rectSidex + rectOffset);
+			rectW.y = minRectPosy + j*(rectSidey + rectOffset);
+			rectW.width = rectSidex;
+			rectW.height = rectSidey;
 			ofDrawRectangle(rectW);
 
 			rectW.x += thickness/2;
@@ -177,7 +205,6 @@ void ofApp::draw(){
 			ofDrawRectangle(rectW);
 
 			if (alphaReset == 255) {
-				cout << "hello!" << endl;
 				// Draw rectangle for update or press
 				// cout << "Row " << i << " Column " << j  << " alpha " << alpha << endl;
 				if (status == 1 && reset_status == false) {
@@ -189,10 +216,10 @@ void ofApp::draw(){
 				}
 
 				ofRectangle rect;
-				rect.x = minRectPosx + i*(rectSide + rectOffset);
-				rect.y = minRectPosy + j*(rectSide + rectOffset);
-				rect.width = rectSide;
-				rect.height = rectSide;
+				rect.x = minRectPosx + i*(rectSidex + rectOffset);
+				rect.y = minRectPosy + j*(rectSidey + rectOffset);
+				rect.width = rectSidex;
+				rect.height = rectSidey;
 
 				ofFill();
 				ofDrawRectangle(rect);

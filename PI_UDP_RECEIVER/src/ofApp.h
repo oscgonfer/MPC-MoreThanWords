@@ -14,8 +14,6 @@ class ofApp : public ofBaseApp{
 		void draw();
 
 		ofxUDPManager udpConnection;
-		ofTrueTypeFont  mono;
-		ofTrueTypeFont  monosm;
 		int lengthUdp;
 
 		#define totRows 4
@@ -32,7 +30,11 @@ class ofApp : public ofBaseApp{
 		int minRectPosx = 45;
 		int minRectPosy = 45;
 		int rectOffset = 75;
-		int rectSide = 180;
+		int rectSidex = 180;
+		int rectSidey = 180;
+		float anglex = 0;
+		float angley = 0;
+		float anglez = 0;
 		int thickness = 9;
 };
 
