@@ -41,6 +41,7 @@ void ofApp::setup(){
 	ofxUDPSettings settings;
 	// Pi address? 192.168.43.48
 	settings.sendTo("169.254.244.167", 11999);
+
 	settings.blocking = false;
 
 	udpConnection.Setup(settings);
@@ -169,9 +170,11 @@ void ofApp::update(){
     int column = 0;
 
 	for (int i = 0; i < totColumns*totRows; i++) {
-
+		// Hot fix for mirror
 		row = floor(i/totRows);
 		column = i-row*totRows;
+
+		row = 3-row;
 		
 		message+=ofToString(updatedButton[row][column])+"|"+ofToString(arrayButton[row][column])+"[/p]";
 	} 
