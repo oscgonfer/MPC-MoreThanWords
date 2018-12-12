@@ -20,4 +20,9 @@ class ofApp : public ofBaseApp{
 		ofxJSONElement json;
 		ofTrueTypeFont ttf;
 		int tot_num_tweets = 10;
+		int posX = 20;
+		int posY = 20;
+		int red = 255;
+		int blue = 255;
+		int green = 255;
 };
