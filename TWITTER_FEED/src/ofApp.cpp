@@ -2,7 +2,7 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-	ofSetBackgroundColor(0,255,0);
+	ofSetBackgroundColor(0,0,0);
 	ofTrueTypeFont::setGlobalDpi(72);
 
 
