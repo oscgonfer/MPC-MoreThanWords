@@ -92,37 +92,52 @@ void ofApp::update(){
 					rectSidey --;
 					break;
 				case 55:
-					rectOffset ++;
+					rectOffsetx ++;
 					break;
 				case 56:
-					rectOffset --;
+					rectOffsetx --;
 					break;
-				case 57:
-					thickness ++;
+				/*case 57:
+					rectOffsety ++;
 					break;
 				case 48:
-					thickness --;
+					rectOffsety --;
+					break;
+				*/
+				case 57:
+					thicknessx ++;
+					break;
+				case 48:
+					thicknessx --;
 					break;
 				case 113:
-					cout << "minRectPosx " << minRectPosx << " | minRectPosy " << minRectPosy << " | rectSide " << rectSidex << " | rectSidey " << rectSidey << " | anglex "<< anglex << " | angley "<< angley << " | anglez "<< anglez << " | rectOffset " << rectOffset << " | thickness " << thickness << endl;
+					cout << "minRectPosx " << minRectPosx << " | minRectPosy " << minRectPosy << " | rectSide " << rectSidex << " | rectSidey " << rectSidey << " | anglex "<< anglex << " | angley "<< angley << " | anglez "<< anglez << " | rectOffsetx " << rectOffsetx << " | rectOffsety " << rectOffsety << endl;
+					cout << "thicknessx " << thicknessx << " | thicknessy " << thicknessy << endl;
 					break;
-				case 114:
-					anglex += 0.5;
+				/*case 114:
+					anglex += 0.1;
 					break;
 				case 116:
-					anglex -= 0.5;
+					anglex -= 0.1;
+					break;
+				*/
+				case 114:
+					thicknessy ++;
+					break;
+				case 116:
+					thicknessy --;
 					break;
 				case 121:
-					angley += 0.5;
+					angley += 0.1;
 					break;
 				case 117:
-					angley -= 0.5;
+					angley -= 0.1;
 					break;
 				case 105:
-					anglez += 0.5;
+					anglez += 0.1;
 					break;
 				case 111:
-					anglez -= 0.5;
+					anglez -= 0.1;
 					break;
 			}
 		}
@@ -191,16 +206,16 @@ void ofApp::draw(){
 
 			// ofNoFill();
 			ofRectangle rectW;
-			rectW.x = minRectPosx + i*(rectSidex + rectOffset);
-			rectW.y = minRectPosy + j*(rectSidey + rectOffset);
+			rectW.x = minRectPosx + i*(rectSidex + rectOffsetx);
+			rectW.y = minRectPosy + j*(rectSidey + rectOffsety);
 			rectW.width = rectSidex;
 			rectW.height = rectSidey;
 			ofDrawRectangle(rectW);
 
-			rectW.x += thickness/2;
-			rectW.y += thickness/2;
-			rectW.width -= thickness;
-			rectW.height -= thickness;
+			rectW.x += thicknessx/2;
+			rectW.y += thicknessy/2;
+			rectW.width -= thicknessx;
+			rectW.height -= thicknessy;
 			ofSetColor(0,0,0);
 			ofDrawRectangle(rectW);
 
@@ -216,8 +231,8 @@ void ofApp::draw(){
 				}
 
 				ofRectangle rect;
-				rect.x = minRectPosx + i*(rectSidex + rectOffset);
-				rect.y = minRectPosy + j*(rectSidey + rectOffset);
+				rect.x = minRectPosx + i*(rectSidex + rectOffsetx);
+				rect.y = minRectPosy + j*(rectSidey + rectOffsety);
 				rect.width = rectSidex;
 				rect.height = rectSidey;
 

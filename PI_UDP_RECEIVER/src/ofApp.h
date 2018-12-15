@@ -27,14 +27,16 @@ class ofApp : public ofBaseApp{
 		int timeFadeOutAll = 3; // Time in seconds to fade out after reset
 
 		// Draw
-		int minRectPosx = 45;
-		int minRectPosy = 45;
-		int rectOffset = 75;
-		int rectSidex = 180;
-		int rectSidey = 180;
-		float anglex = 0;
-		float angley = 0;
-		float anglez = 0;
-		int thickness = 9;
+		int minRectPosx = 118;
+		int minRectPosy = 24;
+		int rectOffsetx = 189;
+		int rectOffsety = 103;
+		int rectSidex = 291;
+		int rectSidey = 178;
+		float anglex = -6.6;
+		float angley = -0.5;
+		float anglez = -0.4;
+		int thicknessx = 48;
+		int thicknessy = 33;
 };
 
