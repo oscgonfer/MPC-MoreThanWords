@@ -9,6 +9,134 @@
 		<string>46</string>
 		<key>objects</key>
 		<dict>
+			<key>6D1B1374F49162E3472B3BAC</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>4</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>ofxSmartFont.h</string>
+				<key>path</key>
+				<string>../../../../addons/ofxSmartFont/src/ofxSmartFont.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>DECA82C941177B0FD7800BA1</key>
+			<dict>
+				<key>children</key>
+				<array>
+					<string>CCE76274143D2E0019C753C0</string>
+					<string>6D1B1374F49162E3472B3BAC</string>
+				</array>
+				<key>isa</key>
+				<string>PBXGroup</string>
+				<key>name</key>
+				<string>src</string>
+				<key>sourceTree</key>
+				<string>&lt;group&gt;</string>
+			</dict>
+			<key>92CB46D48EC846004FCBE8EF</key>
+			<dict>
+				<key>children</key>
+				<array>
+					<string>DECA82C941177B0FD7800BA1</string>
+				</array>
+				<key>isa</key>
+				<string>PBXGroup</string>
+				<key>name</key>
+				<string>ofxSmartFont</string>
+				<key>sourceTree</key>
+				<string>&lt;group&gt;</string>
+			</dict>
+			<key>C065B03C6B92AF99B3F6E247</key>
+			<dict>
+				<key>fileRef</key>
+				<string>CCE76274143D2E0019C753C0</string>
+				<key>isa</key>
+				<string>PBXBuildFile</string>
+			</dict>
+			<key>CCE76274143D2E0019C753C0</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.cpp.cpp</string>
+				<key>fileEncoding</key>
+				<string>4</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>ofxSmartFont.cpp</string>
+				<key>path</key>
+				<string>../../../../addons/ofxSmartFont/src/ofxSmartFont.cpp</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>D39AD94587FEBD2F3415E453</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>4</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>ofxParagraph.h</string>
+				<key>path</key>
+				<string>../../../../addons/ofxParagraph/src/ofxParagraph.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>D9D907CF8274F6B8060E4ABB</key>
+			<dict>
+				<key>children</key>
+				<array>
+					<string>D225FFDB8A179B03B9303431</string>
+					<string>D39AD94587FEBD2F3415E453</string>
+				</array>
+				<key>isa</key>
+				<string>PBXGroup</string>
+				<key>name</key>
+				<string>src</string>
+				<key>sourceTree</key>
+				<string>&lt;group&gt;</string>
+			</dict>
+			<key>2877BAA6CBC8D4E5C28F2D34</key>
+			<dict>
+				<key>children</key>
+				<array>
+					<string>D9D907CF8274F6B8060E4ABB</string>
+				</array>
+				<key>isa</key>
+				<string>PBXGroup</string>
+				<key>name</key>
+				<string>ofxParagraph</string>
+				<key>sourceTree</key>
+				<string>&lt;group&gt;</string>
+			</dict>
+			<key>DB0305C169FF42A45DF11676</key>
+			<dict>
+				<key>fileRef</key>
+				<string>D225FFDB8A179B03B9303431</string>
+				<key>isa</key>
+				<string>PBXBuildFile</string>
+			</dict>
+			<key>D225FFDB8A179B03B9303431</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.cpp.cpp</string>
+				<key>fileEncoding</key>
+				<string>4</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>ofxParagraph.cpp</string>
+				<key>path</key>
+				<string>../../../../addons/ofxParagraph/src/ofxParagraph.cpp</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
 			<key>CCDC6F9CCF925CC402160B85</key>
 			<dict>
 				<key>children</key>
@@ -346,6 +474,8 @@ fi
 						<string>../../../../addons/ofxJSON/libs/jsoncpp/include/json</string>
 						<string>../../../../addons/ofxJSON/libs/jsoncpp/src</string>
 						<string>../../../../addons/ofxJSON/src</string>
+						<string>../../../../addons/ofxParagraph/src</string>
+						<string>../../../../addons/ofxSmartFont/src</string>
 					</array>
 					<key>CONFIGURATION_BUILD_DIR</key>
 					<string>$(SRCROOT)/bin/</string>
@@ -412,6 +542,8 @@ fi
 						<string>../../../../addons/ofxJSON/libs/jsoncpp/include/json</string>
 						<string>../../../../addons/ofxJSON/libs/jsoncpp/src</string>
 						<string>../../../../addons/ofxJSON/src</string>
+						<string>../../../../addons/ofxParagraph/src</string>
+						<string>../../../../addons/ofxSmartFont/src</string>
 					</array>
 					<key>COMBINE_HIDPI_IMAGES</key>
 					<string>YES</string>
@@ -454,6 +586,8 @@ fi
 				<key>children</key>
 				<array>
 					<string>2865DAEF86B1907A704CA70B</string>
+					<string>2877BAA6CBC8D4E5C28F2D34</string>
+					<string>92CB46D48EC846004FCBE8EF</string>
 				</array>
 				<key>isa</key>
 				<string>PBXGroup</string>
@@ -615,6 +749,8 @@ fi
 						<string>../../../../addons/ofxJSON/libs/jsoncpp/include/json</string>
 						<string>../../../../addons/ofxJSON/libs/jsoncpp/src</string>
 						<string>../../../../addons/ofxJSON/src</string>
+						<string>../../../../addons/ofxParagraph/src</string>
+						<string>../../../../addons/ofxSmartFont/src</string>
 					</array>
 					<key>CONFIGURATION_BUILD_DIR</key>
 					<string>$(SRCROOT)/bin/</string>
@@ -679,6 +815,8 @@ fi
 						<string>../../../../addons/ofxJSON/libs/jsoncpp/include/json</string>
 						<string>../../../../addons/ofxJSON/libs/jsoncpp/src</string>
 						<string>../../../../addons/ofxJSON/src</string>
+						<string>../../../../addons/ofxParagraph/src</string>
+						<string>../../../../addons/ofxSmartFont/src</string>
 					</array>
 					<key>CONFIGURATION_BUILD_DIR</key>
 					<string>$(SRCROOT)/bin/</string>
@@ -737,6 +875,8 @@ fi
 					<string>E4B69E210A3A1BDC003C02F2</string>
 					<string>57753805D2FDAD6521FF2A81</string>
 					<string>0C2C8F82B747F53EA6007BA9</string>
+					<string>DB0305C169FF42A45DF11676</string>
+					<string>C065B03C6B92AF99B3F6E247</string>
 				</array>
 				<key>isa</key>
 				<string>PBXSourcesBuildPhase</string>
@@ -829,6 +969,8 @@ fi
 						<string>../../../../addons/ofxJSON/libs/jsoncpp/include/json</string>
 						<string>../../../../addons/ofxJSON/libs/jsoncpp/src</string>
 						<string>../../../../addons/ofxJSON/src</string>
+						<string>../../../../addons/ofxParagraph/src</string>
+						<string>../../../../addons/ofxSmartFont/src</string>
 					</array>
 					<key>COMBINE_HIDPI_IMAGES</key>
 					<string>YES</string>
@@ -880,6 +1022,8 @@ fi
 						<string>../../../../addons/ofxJSON/libs/jsoncpp/include/json</string>
 						<string>../../../../addons/ofxJSON/libs/jsoncpp/src</string>
 						<string>../../../../addons/ofxJSON/src</string>
+						<string>../../../../addons/ofxParagraph/src</string>
+						<string>../../../../addons/ofxSmartFont/src</string>
 					</array>
 					<key>COMBINE_HIDPI_IMAGES</key>
 					<string>YES</string>

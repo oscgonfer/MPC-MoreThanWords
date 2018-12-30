@@ -2,27 +2,29 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-	ofSetBackgroundColor(0,0,0);
+	// ofSetBackgroundColor(0,0,0);
 	ofTrueTypeFont::setGlobalDpi(72);
 
-
 	std::string file = json_file_name;
-	ttf.load("verdana.ttf", 14, true, true);
-	ttf.setLineHeight(20.0f);
-	bool parsingSuccessful = json.open(file);
+	// ttf.load("verdana.ttf", 14, true, true);
+	// ttf.setLineHeight(20.0f);
+	// bool parsingSuccessful = json.open(file);
 
-	if (parsingSuccessful) {
-		ofLogNotice("ofApp::setup") << json.getRawString();
-	} else {
-		ofLogError("ofApp::setup") << "Failed to parse JSON" << endl;
-	}
+	// if (parsingSuccessful) {
+	// 	ofLogNotice("ofApp::setup") << json.getRawString();
+	// } else {
+	// 	ofLogError("ofApp::setup") << "Failed to parse JSON" << endl;
+	// }
 
 	ofSetVerticalSync(true);
 	ofSetFrameRate(30);
-}
 
-//--------------------------------------------------------------
-void ofApp::update(){
+	// check for high resolution display //
+    if (ofGetScreenWidth()>=2560 && ofGetScreenHeight()>=1600)
+    {
+        pWidth*=2;
+        pFontSize*=2;
+	}
 
 }
 
@@ -30,25 +32,41 @@ void ofApp::update(){
 void ofApp::draw(){
 
 	std::string file = json_file_name;
-	std::stringstream ss;
+	pFont = ofxSmartFont::add("fonts/raleway/Raleway-Medium.ttf", pFontSize*2, "raleway-medium");
+	authorFont = ofxSmartFont::add("fonts/raleway/Raleway-Bold.ttf", pFontSize*2, "raleway-bold");
 
 	bool parsingSuccessful = json.open(file);
 	int min_index;
 
 	int js_size;
+
 	if (parsingSuccessful) {
+		json.getRawString();
 		js_size = json.size();
+
 	} else {
+		ofLogError("ofApp::draw") << "Failed to parse JSON" << endl;
 		js_size = 0;
+
 	}
 	
+	cout << "[Debug] JSON size " << js_size << endl;
+	int posY = 0;
+
 	if (js_size > 0) {
+		
 		min_index = js_size - tot_num_tweets;
 		if (min_index < 0) min_index = 0;
-		for (unsigned int i = js_size-1; i > min_index; i--) {
+		cout << "[Debug] We have tweets. min_index = " << min_index << endl;
+		
+		for (unsigned int i = js_size; i > min_index; i--) {
+			if (i==js_size){
+				posY = posYinit;
+			}
+			// cout << "[Debug] index json " << i << endl;
 			// cout << json[ofToString(i)] << endl;
-			const Json::Value author_full = json[ofToString(i)]["author"];
-			const Json::Value text_full = json[ofToString(i)]["text"];
+			const Json::Value author_full = json[ofToString(i-1)]["author"];
+			const Json::Value text_full = json[ofToString(i-1)]["clean_text"];
 			// cout << "Tweet # " << ofToString(i) <<  " | Author " << author_full << " | Text " << text_full << endl;
 			
 			string author = ofToString(author_full);
@@ -57,23 +75,47 @@ void ofApp::draw(){
 			author.erase(
 			    remove( author.begin(), author.end(), '\n' ), author.end());
 
-			// cout << author << endl;
-
 			string text = ofToString(text_full);
 			text.erase(
 			    remove( text.begin(), text.end(), '\"' ), text.end());
 			text.erase(
 			    remove( text.begin(), text.end(), '\n' ), text.end());
 			text.erase(
+			    remove( text.begin(), text.end(), '\t' ), text.end());
+			text.erase(
 			    remove( text.begin(), text.end(), '\\' ), text.end());
 
-			ss << ofToString(author) + ": " + ofToString(text) << endl;
+			std::stringstream ss;
+
+			ss << "@" + ofToString(author) + ": " + ofToString(text);
+			cout << ofToString(i) << " " << ss.str() << endl;
+
+			ofxParagraph* authorP = new ofxParagraph(author);
+			authorP->setAlignment(ofxParagraph::ALIGN_LEFT);
+			authorP->setFont(authorFont);
+			authorP->setWidth(pWidth);
+			authorP->setColor(ofColor::fromHex(0x555555));
+			authorP->setLeading(pLeading);
+			int pSpacing = pFontSize*1;
+			authorP->setSpacing(pSpacing);
+			authorP->setIndent(0);
+			authorP->draw(posX, posY);
+			int authorWidth = authorFont->width(author)+pSpacing;
 			
+			ofxParagraph* p = new ofxParagraph(text);
+			p->setAlignment(ofxParagraph::ALIGN_LEFT);
+			p->setFont(pFont);
+			p->setWidth(pWidth);
+			p->setColor(ofColor::fromHex(0x555555));
+			p->setLeading(pLeading);
+			p->setSpacing(pSpacing);
+			// p->setIndent((author.size()*pFontSize + pSpacing));
+			p->setIndent(authorWidth);
+			p->draw(posX, posY);
+			int prevHeight = p->getHeight();
+			posY += prevHeight + pLeading*2;
+
 		}
-		// ofSetColor(255, 255, 255);
-		// ttf.drawString(ss.str(), posX, posY);
-		ofSetColor(red, green, blue);
-		ttf.drawString(ss.str(), posX, posY);
 	}
 }
 
@@ -87,16 +129,28 @@ void ofApp::keyPressed(int key){
 			posX --;
 			break; 
 		case OF_KEY_DOWN:
-			posY ++;
+			posYinit ++;
 			break; 
 		case OF_KEY_UP:
-			posY --;
+			posYinit --;
 			break; 
 		case 'a':
 			tot_num_tweets++;
 			break;
 		case 's':
 			tot_num_tweets--;
+			break;
+		case 'z':
+			pWidth++;
+			break;
+		case 'x':
+			pWidth--;
+			break;
+		case 'q':
+			pFontSize++;
+			break;
+		case 'w':
+			pFontSize--;
 			break;
 		case 'r':
 			red++;
@@ -123,9 +177,4 @@ void ofApp::keyPressed(int key){
 			if (blue < 0) blue = 0;
 			break;
 	}
-}
-
-//--------------------------------------------------------------
-void ofApp::keyReleased(int key){
-
 }
