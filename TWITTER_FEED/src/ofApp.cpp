@@ -2,19 +2,8 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-	// ofSetBackgroundColor(0,0,0);
-	ofTrueTypeFont::setGlobalDpi(72);
-
-	std::string file = json_file_name;
-	// ttf.load("verdana.ttf", 14, true, true);
-	// ttf.setLineHeight(20.0f);
-	// bool parsingSuccessful = json.open(file);
-
-	// if (parsingSuccessful) {
-	// 	ofLogNotice("ofApp::setup") << json.getRawString();
-	// } else {
-	// 	ofLogError("ofApp::setup") << "Failed to parse JSON" << endl;
-	// }
+	ofSetBackgroundColor(backgroundGeneral);
+	ofTrueTypeFont::setGlobalDpi(200);
 
 	ofSetVerticalSync(true);
 	ofSetFrameRate(30);
@@ -53,11 +42,15 @@ void ofApp::draw(){
 	cout << "[Debug] JSON size " << js_size << endl;
 	int posY = 0;
 
+	// Draw rectangle in the background
+	ofSetColor(backgroundParagraph);
+	ofDrawRectangle(0, 0, posX*1.5 + pWidth, ofGetScreenHeight());
+
 	if (js_size > 0) {
 		
 		min_index = js_size - tot_num_tweets;
 		if (min_index < 0) min_index = 0;
-		cout << "[Debug] We have tweets. min_index = " << min_index << endl;
+		// cout << "[Debug] We have tweets. min_index = " << min_index << endl;
 		
 		for (unsigned int i = js_size; i > min_index; i--) {
 			if (i==js_size){
@@ -86,34 +79,42 @@ void ofApp::draw(){
 			    remove( text.begin(), text.end(), '\\' ), text.end());
 
 			std::stringstream ss;
+			std::stringstream authorString;
 
+			authorString << "@" + ofToString(author) + ": ";
 			ss << "@" + ofToString(author) + ": " + ofToString(text);
 			cout << ofToString(i) << " " << ss.str() << endl;
 
-			ofxParagraph* authorP = new ofxParagraph(author);
+			// Author
+			ofxParagraph* authorP = new ofxParagraph(authorString.str());
 			authorP->setAlignment(ofxParagraph::ALIGN_LEFT);
 			authorP->setFont(authorFont);
 			authorP->setWidth(pWidth);
-			authorP->setColor(ofColor::fromHex(0x555555));
+			authorP->setColor(pColor);
 			authorP->setLeading(pLeading);
 			int pSpacing = pFontSize*1;
 			authorP->setSpacing(pSpacing);
 			authorP->setIndent(0);
 			authorP->draw(posX, posY);
-			int authorWidth = authorFont->width(author)+pSpacing;
+			int authorWidth = authorFont->width(authorString.str())+pSpacing;
 			
+			// Actual tweet
 			ofxParagraph* p = new ofxParagraph(text);
 			p->setAlignment(ofxParagraph::ALIGN_LEFT);
 			p->setFont(pFont);
 			p->setWidth(pWidth);
-			p->setColor(ofColor::fromHex(0x555555));
+			p->setColor(pColor);
 			p->setLeading(pLeading);
 			p->setSpacing(pSpacing);
-			// p->setIndent((author.size()*pFontSize + pSpacing));
 			p->setIndent(authorWidth);
 			p->draw(posX, posY);
+
+			// Move down the next paragraph
 			int prevHeight = p->getHeight();
-			posY += prevHeight + pLeading*2;
+			int extraHeight = pLeading*2;
+			
+			posY += prevHeight + extraHeight;
+			
 
 		}
 	}

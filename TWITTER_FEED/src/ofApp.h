@@ -27,7 +27,9 @@ class ofApp : public ofBaseApp{
 	    int pFontSize = 14;
 		float pPadding = pWidth*.30;
 		int pLeading = 5;
-		// int pSpacing = 10;
+		ofColor pColor = ofColor::fromHex(0xFFFFFF); // twitterBlue = 0x1da1f2
+		ofColor backgroundParagraph = ofColor::fromHex(0x1da1f2);
+		ofColor backgroundGeneral = ofColor::fromHex(0x666666);
 
 		int tot_num_tweets = 10;
 		int posX = 10;
