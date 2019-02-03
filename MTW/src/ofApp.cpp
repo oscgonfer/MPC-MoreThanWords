@@ -453,9 +453,7 @@ void ofApp::keyPressed(int key){
         	}
             break;
 
-        // 1-2: minRectPosX ++/--; 3-4: minRectPosY ++/--; 5-6 rectSide ++/--; 7-8 rectOffset ++/--;
         case '1':
-        	
         	message = ofToString(key) + "[/p]";
         	udpConnection.Send(message.c_str(),message.length());
         	cout << "[Debug] Increase minRectPosx" << endl;
@@ -495,25 +493,25 @@ void ofApp::keyPressed(int key){
         case '7':
         	message = ofToString(key) + "[/p]";
         	udpConnection.Send(message.c_str(),message.length());
-        	cout << "[Debug] Increase rectOffset" << endl;
+        	cout << "[Debug] Increase rectOffsetx" << endl;
         	break;
 
         case '8':
         	message = ofToString(key) + "[/p]";
         	udpConnection.Send(message.c_str(),message.length());
-        	cout << "[Debug] Decrease rectOffset" << endl;
+        	cout << "[Debug] Decrease rectOffsetx" << endl;
         	break;
 
         case '9':
         	message = ofToString(key) + "[/p]";
         	udpConnection.Send(message.c_str(),message.length());
-        	cout << "[Debug] Increase thickness" << endl;
+        	cout << "[Debug] Increase thicknessx" << endl;
         	break;
 
         case '0':
         	message = ofToString(key) + "[/p]";
         	udpConnection.Send(message.c_str(),message.length());
-        	cout << "[Debug] Decrease thickness" << endl;
+        	cout << "[Debug] Decrease thicknessx" << endl;
         	break;
 
         case 'q':
@@ -537,13 +535,13 @@ void ofApp::keyPressed(int key){
         case 'r':
         	message = ofToString(key) + "[/p]";
         	udpConnection.Send(message.c_str(),message.length());
-        	cout << "[Debug] Increase anglex" << endl;
+        	cout << "[Debug] Increase thicknessy" << endl;
         	break;
 
         case 't':
         	message = ofToString(key) + "[/p]";
         	udpConnection.Send(message.c_str(),message.length());
-        	cout << "[Debug] Decrease anglex" << endl;
+        	cout << "[Debug] Decrease thicknessy" << endl;
         	break;
 
         case 'y':
@@ -568,6 +566,30 @@ void ofApp::keyPressed(int key){
         	message = ofToString(key) + "[/p]";
         	udpConnection.Send(message.c_str(),message.length());
         	cout << "[Debug] Decrease anglez" << endl;
+        	break;
+
+        case 'a':
+        	message = ofToString(key) + "[/p]";
+        	udpConnection.Send(message.c_str(),message.length());
+        	cout << "[Debug] Increase rectOffsety" << endl;
+        	break;	
+
+        case 's':
+        	message = ofToString(key) + "[/p]";
+        	udpConnection.Send(message.c_str(),message.length());
+        	cout << "[Debug] Decrease rectOffsety" << endl;
+        	break;
+
+        case 'd':
+        	message = ofToString(key) + "[/p]";
+        	udpConnection.Send(message.c_str(),message.length());
+        	cout << "[Debug] Increase anglex" << endl;
+        	break;
+
+        case 'f':
+        	message = ofToString(key) + "[/p]";
+        	udpConnection.Send(message.c_str(),message.length());
+        	cout << "[Debug] Decrease anglex" << endl;
         	break;
     }
 }
