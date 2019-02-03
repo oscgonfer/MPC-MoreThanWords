@@ -3,7 +3,6 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
 	ofSetBackgroundColor(backgroundGeneral);
-	ofTrueTypeFont::setGlobalDpi(200);
 
 	ofSetVerticalSync(true);
 	ofSetFrameRate(30);
@@ -21,8 +20,9 @@ void ofApp::setup(){
 void ofApp::draw(){
 
 	std::string file = json_file_name;
-	pFont = ofxSmartFont::add("fonts/raleway/Raleway-Medium.ttf", pFontSize*2, "raleway-medium");
-	authorFont = ofxSmartFont::add("fonts/raleway/Raleway-Bold.ttf", pFontSize*2, "raleway-bold");
+	authorFont = ofxSmartFont::add("fonts/HelveticaNeue.dfont", pFontSize*2);
+	hFont = ofxSmartFont::add("fonts/HelveticaNeueLight.ttf", pFontSize*2);
+	pFont = ofxSmartFont::add("fonts/HelveticaNeue-Roman.otf", pFontSize*2);
 
 	bool parsingSuccessful = json.open(file);
 	int min_index;
@@ -39,12 +39,12 @@ void ofApp::draw(){
 
 	}
 	
-	cout << "[Debug] JSON size " << js_size << endl;
+	// cout << "[Debug] JSON size " << js_size << endl;
 	int posY = 0;
 
 	// Draw rectangle in the background
 	ofSetColor(backgroundParagraph);
-	ofDrawRectangle(0, 0, posX*1.5 + pWidth, ofGetScreenHeight());
+	ofDrawRectangle(0, 0, posX*1.3 + pWidth, ofGetScreenHeight());
 
 	if (js_size > 0) {
 		
@@ -60,6 +60,7 @@ void ofApp::draw(){
 			// cout << json[ofToString(i)] << endl;
 			const Json::Value author_full = json[ofToString(i-1)]["author"];
 			const Json::Value text_full = json[ofToString(i-1)]["clean_text"];
+			const Json::Value handle_full = json[ofToString(i-1)]["handle"];
 			// cout << "Tweet # " << ofToString(i) <<  " | Author " << author_full << " | Text " << text_full << endl;
 			
 			string author = ofToString(author_full);
@@ -67,6 +68,12 @@ void ofApp::draw(){
 			    remove( author.begin(), author.end(), '\"' ), author.end());
 			author.erase(
 			    remove( author.begin(), author.end(), '\n' ), author.end());
+
+			string handle = ofToString(handle_full);
+			handle.erase(
+			    remove( handle.begin(), handle.end(), '\"' ), handle.end());
+			handle.erase(
+			    remove( handle.begin(), handle.end(), '\n' ), handle.end());
 
 			string text = ofToString(text_full);
 			text.erase(
@@ -79,14 +86,14 @@ void ofApp::draw(){
 			    remove( text.begin(), text.end(), '\\' ), text.end());
 
 			std::stringstream ss;
-			std::stringstream authorString;
+			std::stringstream handleString;
 
-			authorString << "@" + ofToString(author) + ": ";
-			ss << "@" + ofToString(author) + ": " + ofToString(text);
-			cout << ofToString(i) << " " << ss.str() << endl;
+			handleString << "@" + ofToString(handle);
+			// ss << "@" + ofToString(author) + ": " + ofToString(text);
+			// cout << ofToString(i) << " " << ss.str() << endl;
 
 			// Author
-			ofxParagraph* authorP = new ofxParagraph(authorString.str());
+			ofxParagraph* authorP = new ofxParagraph(author);
 			authorP->setAlignment(ofxParagraph::ALIGN_LEFT);
 			authorP->setFont(authorFont);
 			authorP->setWidth(pWidth);
@@ -95,8 +102,22 @@ void ofApp::draw(){
 			int pSpacing = pFontSize*1;
 			authorP->setSpacing(pSpacing);
 			authorP->setIndent(0);
+			// authorP->setIndent(0);
 			authorP->draw(posX, posY);
-			int authorWidth = authorFont->width(authorString.str())+pSpacing;
+			int authorHeight = authorFont->height(author);
+
+			// Handle
+			ofxParagraph* handleP = new ofxParagraph(handleString.str());
+			handleP->setAlignment(ofxParagraph::ALIGN_LEFT);
+			handleP->setFont(hFont);
+			handleP->setWidth(pWidth);
+			handleP->setColor(pColor);
+			handleP->setLeading(pLeading);
+			handleP->setSpacing(pSpacing);
+			handleP->setIndent(0);
+			// handleP->setIndent(0);
+			handleP->draw(posX, posY + authorHeight + pSpacing/2);
+			int handleHeight = authorFont->height(handleString.str());
 			
 			// Actual tweet
 			ofxParagraph* p = new ofxParagraph(text);
@@ -105,17 +126,16 @@ void ofApp::draw(){
 			p->setWidth(pWidth);
 			p->setColor(pColor);
 			p->setLeading(pLeading);
-			p->setSpacing(pSpacing);
-			p->setIndent(authorWidth);
-			p->draw(posX, posY);
+			// p->setSpacing(pSpacing);
+			p->setIndent(0);
+			p->draw(posX, posY + handleHeight + authorHeight + pSpacing);
 
 			// Move down the next paragraph
-			int prevHeight = p->getHeight();
-			int extraHeight = pLeading*2;
+			int prevHeight = p->getHeight()+ handleHeight + authorHeight + 3*pSpacing;
+			int extraHeight = pLeading*3;
 			
 			posY += prevHeight + extraHeight;
-			
-
+		
 		}
 	}
 }
