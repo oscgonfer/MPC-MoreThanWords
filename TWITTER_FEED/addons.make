@@ -1,3 +1,4 @@
 ofxJSON
 ofxParagraph
 ofxSmartFont
+ofxSyphon

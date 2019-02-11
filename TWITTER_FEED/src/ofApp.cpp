@@ -5,19 +5,18 @@ void ofApp::setup(){
 	ofSetBackgroundColor(backgroundGeneral);
 
 	ofSetVerticalSync(true);
-	ofSetFrameRate(30);
-
-	// check for high resolution display //
-    if (ofGetScreenWidth()>=2560 && ofGetScreenHeight()>=1600)
-    {
-        pWidth*=2;
-        pFontSize*=2;
-	}
+	ofSetFrameRate(10);
+    ofEnableSmoothing();
+	mainOutputSyphonServer.setName("Twitter_Feed");
 
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+    
+    // Clear with alpha, so we can capture via syphon and composite elsewhere should we want.
+    glClearColor(0.0, 0.0, 0.0, 0.0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	std::string file = json_file_name;
 	authorFont = ofxSmartFont::add("fonts/HelveticaNeue.dfont", pFontSize*2);
@@ -116,7 +115,7 @@ void ofApp::draw(){
 			handleP->setSpacing(pSpacing);
 			handleP->setIndent(0);
 			// handleP->setIndent(0);
-			handleP->draw(posX, posY + authorHeight + pSpacing/2);
+			handleP->draw(posX, posY + authorHeight + pSpacing);
 			int handleHeight = authorFont->height(handleString.str());
 			
 			// Actual tweet
@@ -128,7 +127,7 @@ void ofApp::draw(){
 			p->setLeading(pLeading);
 			// p->setSpacing(pSpacing);
 			p->setIndent(0);
-			p->draw(posX, posY + handleHeight + authorHeight + pSpacing);
+			p->draw(posX, posY + handleHeight + authorHeight + pSpacing*2);
 
 			// Move down the next paragraph
 			int prevHeight = p->getHeight()+ handleHeight + authorHeight + 3*pSpacing;
@@ -138,6 +137,7 @@ void ofApp::draw(){
 		
 		}
 	}
+	mainOutputSyphonServer.publishScreen();
 }
 
 //--------------------------------------------------------------
@@ -172,30 +172,6 @@ void ofApp::keyPressed(int key){
 			break;
 		case 'w':
 			pFontSize--;
-			break;
-		case 'r':
-			red++;
-			if (red > 255) red = 255;
-			break;
-		case 't':
-			red--;
-			if (red < 0) red = 0;
-			break;
-		case 'g':
-			green++;
-			if (green > 255) green = 255;
-			break;
-		case 'h':
-			green--;
-			if (green < 0) green = 0;
-			break;
-		case 'b':
-			blue++;
-			if (blue > 255) blue = 255;
-			break;
-		case 'n':
-			blue--;
-			if (blue < 0) blue = 0;
 			break;
 	}
 }
