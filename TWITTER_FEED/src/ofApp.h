@@ -32,7 +32,7 @@ class ofApp : public ofBaseApp{
 		int pLeading = 3;
 		ofColor pColor = ofColor::fromHex(0xFFFFFF); // twitterBlue = 0x1da1f2
 		ofColor hColor = ofColor::fromHex(0xccd6dd); // twitterBlue = 0x1da1f2
-		ofColor backgroundParagraph = ofColor::fromHex(0x1f2429);
+		ofColor backgroundParagraph = ofColor::fromHex(0x000000); //0x1f2429
 		ofColor backgroundGeneral = ofColor::fromHex(0x1f2429);
 
 		int tot_num_tweets = 10;

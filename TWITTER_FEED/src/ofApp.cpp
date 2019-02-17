@@ -20,7 +20,7 @@ void ofApp::draw(){
 
 	std::string file = json_file_name;
 	authorFont = ofxSmartFont::add("fonts/HelveticaNeue.dfont", pFontSize*2);
-	hFont = ofxSmartFont::add("fonts/HelveticaNeueLight.ttf", pFontSize*2);
+	hFont = ofxSmartFont::add("fonts/HelveticaNeueLight.ttf", (pFontSize)*2);
 	pFont = ofxSmartFont::add("fonts/HelveticaNeue-Roman.otf", pFontSize*2);
 
 	bool parsingSuccessful = json.open(file);
@@ -130,7 +130,7 @@ void ofApp::draw(){
 			p->draw(posX, posY + handleHeight + authorHeight + pSpacing*2);
 
 			// Move down the next paragraph
-			int prevHeight = p->getHeight()+ handleHeight + authorHeight + 3*pSpacing;
+			int prevHeight = p->getHeight()+ handleHeight + authorHeight + 3.8*pSpacing;
 			int extraHeight = pLeading*3;
 			
 			posY += prevHeight + extraHeight;
