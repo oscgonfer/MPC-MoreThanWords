@@ -26,8 +26,8 @@ class ofApp : public ofBaseApp{
 		// ofTrueTypeFont pFont;
 		vector<ofxParagraph*> paragraphs;
 		
-	    int pWidth = 380;
-	    int pFontSize = 6;
+	    int pWidth = 410;
+	    int pFontSize = 9;
 		float pPadding = pWidth*.30;
 		int pLeading = 3;
 		ofColor pColor = ofColor::fromHex(0xFFFFFF); // twitterBlue = 0x1da1f2
@@ -36,8 +36,8 @@ class ofApp : public ofBaseApp{
 		ofColor backgroundGeneral = ofColor::fromHex(0x1f2429);
 
 		int tot_num_tweets = 10;
-		int posX = 30;
-		int posYinit = 30;
+		int posX = 50;
+		int posYinit = 100;
 
 		ofxSyphonServer mainOutputSyphonServer;
 };
